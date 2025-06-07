@@ -9,8 +9,9 @@ Some dotnet commands:
 - dotnet sln add Application = add Application folder to solution file.
 - dotnet sln add Domain = add Domain folder to solution file.
 - dotnet sln add Persistence = add Persistence folder to solution file.
-- dotnet run = run a dotn
-- dotnet watch = hot reload enabled
+- dotnet run = run a dotn.
+- dotnet watch = hot reload enabled.
+- dotnet create gitignore = creating a gitignore file.
 
 8. Creating a domain entity
 - In the Domain folder, we created an Activity class.
@@ -38,3 +39,35 @@ Some dotnet commands:
 
 13. Using Postman to test API Endpoints
 - Postman is a nice application to test API endpoints
+
+17. Creating the React project
+- npm create vite@latest = create a vit/react project
+- select 'React' as a framework, 'TypeScript + SWC', follow the rest of the instructions.
+- npm run dev = run the project
+
+18. Reviewing the React project files
+- vite.config.ts shows the configurations for our vite project --> added port number of 3000 in here.
+- main.tsx file is the core component of this project and imports all components (e.g. index.html, index.css and App.tsx)
+
+20. Configuring CORS on the API
+- CORS = Cross-Origin Resource Sharing
+- Determines how data is shared across different domains (e.g. from locaslhost:5001 to localhost:3000)
+
+21. Creating an Activity type in TypeScript
+- In the src folder, we created a lib/types folder, which contains a file called index.d.ts.
+- This file defined the activity type, which is neccessary in order to resolve the error with 'activity.id' and 'activity.title'.
+- To prevent typos while creating a ts file, use a tool like JSON to TypeScript.
+
+23. Adding Material Uni
+- Material UI (MUI) is an open-source React component library that implements Google's Material Design.
+- We can use this library to improve our UI (things like Typography, ListItem, ListItemText, etc.)
+
+24. Adding HTTPS support to the client application
+- use the following cmd: npm install -D vite-plugin-mkcert
+- In the vite.config.ts, you should specify:
+    - import mkcert from 'vite-plugin-mkcert'
+    - inside the plugins property: mkcert()
+
+25. Adding Axios for data fetching
+- Axios is a library to fetch data and this will be used to replace the fetch method of javascript.
+- use 'npm install axios' to install axios.
