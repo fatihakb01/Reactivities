@@ -34,8 +34,8 @@ Some dotnet commands:
 - dotnet ef database drop -p Persistence -s API = Drop the database.
 
 12. Seeding data into the database
-- async keyword makes a method asynchronous, which allows to use the await keyword
-- await keyword makes sure that the thread is allowed to do other tasks, while waiting for a specific tasks
+- async keyword makes a method asynchronous, which allows to use the await keyword.
+- await keyword makes sure that the thread is allowed to do other tasks, while waiting for a specific tasks.
 
 13. Using Postman to test API Endpoints
 - Postman is a nice application to test API endpoints
@@ -58,7 +58,7 @@ Some dotnet commands:
 - This file defined the activity type, which is neccessary in order to resolve the error with 'activity.id' and 'activity.title'.
 - To prevent typos while creating a ts file, use a tool like JSON to TypeScript.
 
-23. Adding Material Uni
+23. Adding Material UI
 - Material UI (MUI) is an open-source React component library that implements Google's Material Design.
 - We can use this library to improve our UI (things like Typography, ListItem, ListItemText, etc.)
 
@@ -71,3 +71,28 @@ Some dotnet commands:
 25. Adding Axios for data fetching
 - Axios is a library to fetch data and this will be used to replace the fetch method of javascript.
 - use 'npm install axios' to install axios.
+
+30. Adding a mediator handler for a List
+31. Adding a mediator handler for the Details
+- Mediator is responsible for communicating from the Application to the API.
+- This is neccessary in our project because our Application does not have access to our API.
+- We defined our GetActivityList.cs in our Application folder, which handles the logic of retrieving the data.
+- Then, we used that logic inside ActivitiesController.cs to actually retrieve the data from our API.
+- Subsequently, we added our handler (GetActivityList class) as a service to our Program.cs
+- Same principle applies for GetActivityDetails class..
+
+35. Adding AutoMapper to the project
+- We installed the AutoMapper with NuGet in order to map changes made from the request to the activity from the database.
+
+37. Using Cancellation Tokens
+- This token is useful when a (long) request is cancelled by the client
+- The database needs to know when to stop a request after being cancelled.
+- Our queries are quick, so we don't need it in our project.
+
+38. Using the .NET debugger
+- To create a debugger follow these steps:
+1. Go to Run and Debug (Ctrl+Shift+D).
+2. Click on "create a launch.json file".
+3. Add the following configurations: ".NET: Attach to a .NET process" and ".NET: Launch C# project".
+4. Make sure that the projectPath refers to the project where you added the breakpoints (in our case our API project).
+5. Run the debugger and test the API with Post-man.
