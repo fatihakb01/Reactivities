@@ -96,3 +96,7 @@ Some dotnet commands:
 3. Add the following configurations: ".NET: Attach to a .NET process" and ".NET: Launch C# project".
 4. Make sure that the projectPath refers to the project where you added the breakpoints (in our case our API project).
 5. Run the debugger and test the API with Post-man.
+
+42. Creating a Nav bar
+- We created navbar.tsx that contains a functon, which we use as a component in App.tsx
+- We also use CssBaseline component, which removes default padding on the top of the screen.
