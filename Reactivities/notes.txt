@@ -100,3 +100,16 @@ Some dotnet commands:
 42. Creating a Nav bar
 - We created navbar.tsx that contains a functon, which we use as a component in App.tsx
 - We also use CssBaseline component, which removes default padding on the top of the screen.
+
+55. Setting up React query
+- React query is useful when you want your application to reach a consistent state across all components (i.e. configuring a global state).
+- Install by using the following command: npm i @tanstack/react-query.
+- Put the QueryClientProvider and QueryClient inside main.tsx.
+
+56. React Query developer tools
+- Install dev tools by using the following command: npm i @tanstack/react-query-devtools
+
+Difference between .ts & .tsx files
+- The .ts extension is used for pure TypeScript files. These files contain only TypeScript code without any JSX syntax. They are typically used for utility functions, classes, interfaces, and other TypeScript-specific features.
+- The .tsx extension is used for TypeScript files that include JSX syntax. JSX is a syntax extension that allows you to write HTML-like code within JavaScript/TypeScript. This extension is commonly used for React components where JSX is prevalent.
+

@@ -1,13 +1,20 @@
 import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material"
+import { useActivities } from "../../../lib/hooks/useActivities"
 
 type Props = {
-    activity: Activity;
+    selectedActivity: Activity;
     cancelSelectActivity: () => void;
     openForm: (id: string) => void;
 }
 
 // Display the activity details (next to the activity dashboard)
-export default function ActivityDetail({activity, cancelSelectActivity, openForm}: Props) {
+export default function ActivityDetail({selectedActivity, cancelSelectActivity, openForm}: Props) {
+   // Find the activity that has been changed 
+   const {activities} = useActivities(); 
+   const activity = activities?.find(x => x.id === selectedActivity.id);
+
+   if (!activity) return <Typography>Loading...</Typography>
+
   return (
     <Card sx={{borderRadius: 3}}>
         <CardMedia 
