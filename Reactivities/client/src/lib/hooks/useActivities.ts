@@ -50,7 +50,7 @@ export const useActivities = (id?: string) => {
         }
     });    
 
-    // function for creating an activity
+    // function for deleting an activity
     const deleteActivity = useMutation({
         mutationFn: async (id: string) => {
             await agent.delete(`/activities/${id}`);

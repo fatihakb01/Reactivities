@@ -11,11 +11,12 @@ export default function ActivityForm() {
 
   // Submit form when clicking on submit button 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+
     // Turn off default behavior
     event.preventDefault();
 
+    // Retrieve the form data
     const formData = new FormData(event.currentTarget);
-
     const data: {[key: string]: FormDataEntryValue} = {};
 
     // The 'name' property inside each TextField is the key, and the entered value inside each field is the value

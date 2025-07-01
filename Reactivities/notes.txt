@@ -113,3 +113,8 @@ Difference between .ts & .tsx files
 - The .ts extension is used for pure TypeScript files. These files contain only TypeScript code without any JSX syntax. They are typically used for utility functions, classes, interfaces, and other TypeScript-specific features.
 - The .tsx extension is used for TypeScript files that include JSX syntax. JSX is a syntax extension that allows you to write HTML-like code within JavaScript/TypeScript. This extension is commonly used for React components where JSX is prevalent.
 
+77. Adding a filters component
+- To install React calendar, use: npm install react-calendar
+
+79. Formatting the dates
+- To properly use formatted dates, use the following library: npm install date-fns
