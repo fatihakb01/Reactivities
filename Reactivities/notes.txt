@@ -98,10 +98,11 @@ Some dotnet commands:
 5. Run the debugger and test the API with Post-man.
 
 42. Creating a Nav bar
-- We created navbar.tsx that contains a functon, which we use as a component in App.tsx
+- We created navbar.tsx that contains a function, which we use as a component in App.tsx
 - We also use CssBaseline component, which removes default padding on the top of the screen.
 
 55. Setting up React query
+- used for server-side state management
 - React query is useful when you want your application to reach a consistent state across all components (i.e. configuring a global state).
 - Install by using the following command: npm i @tanstack/react-query.
 - Put the QueryClientProvider and QueryClient inside main.tsx.
@@ -118,3 +119,13 @@ Difference between .ts & .tsx files
 
 79. Formatting the dates
 - To properly use formatted dates, use the following library: npm install date-fns
+
+82. What is MobX?
+- used for client-side state management
+- Observables tells us which objects need to be reactive/observable
+- Actions perform a certain action (i.e. a setter).
+- Computed properties retrieve a certain value (i.e. a getter)
+
+83. Setting up MobX
+- Install: npm install mobx mobx-react-lite
+

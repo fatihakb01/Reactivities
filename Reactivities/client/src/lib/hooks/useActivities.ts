@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../api/agent";
+import { useLocation } from "react-router";
 
 // Responsible for fetching data from our api
 export const useActivities = (id?: string) => {
     const queryClient = useQueryClient();
+    const location = useLocation();
 
     // Fetch activities data from api with react query
     const {data: activities, isPending} = useQuery({
@@ -11,7 +13,9 @@ export const useActivities = (id?: string) => {
         queryFn: async () => {
         const response = await agent.get<Activity[]>('/activities');
         return response.data;
-        }
+        },
+        enabled: !id && location.pathname === '/activities'
+        // staleTime: 1000 * 6 * 5 // The time it takes before an activity is marked as stale (default stale time is 0)
     });
 
     // Fetch the data of a specific activity from api with react query
