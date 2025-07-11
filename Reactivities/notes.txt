@@ -129,3 +129,6 @@ Difference between .ts & .tsx files
 83. Setting up MobX
 - Install: npm install mobx mobx-react-lite
 
+103. Using an Axios interceptor to handle errors
+- If an import error occurs, then go to 'client --> node_modules --> <folder>' to troubleshoot the issue.
+- Use: npm install react-toastify --> in order to see errors on the client side
