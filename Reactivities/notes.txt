@@ -132,3 +132,15 @@ Difference between .ts & .tsx files
 103. Using an Axios interceptor to handle errors
 - If an import error occurs, then go to 'client --> node_modules --> <folder>' to troubleshoot the issue.
 - Use: npm install react-toastify --> in order to see errors on the client side
+
+109. Setting up React hook form
+- 'npm install react-hook-form' is used for setting up the form.
+- 'npm install @hookform/resolvers zod' is used for validation within the form.
+
+114. Creating reusable Date input
+- 'npm install @mui/x-date-pickers' and 'npm install date-fns' to install a date picker library used for our date field.
+
+119. Adding the map view
+- Install the following:
+    1. npm install react-leaflet@next
+    2. npm install -D @types/leaflet

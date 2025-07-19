@@ -31,7 +31,6 @@ agent.interceptors.response.use(
     async error => {
         await sleep(1000);
         store.uiStore.isIdle();
-
         const {status, data} = error.response;
         switch (status) {
             case 400:
@@ -44,7 +43,8 @@ agent.interceptors.response.use(
                     }
                     throw modalStateErrors.flat();
                 } else {
-                    toast.error(data);
+                    console.error("400 error data:", data);
+                    toast.error(typeof data === 'string' ? data : JSON.stringify(data));
                 }
                 break;
             case 401:

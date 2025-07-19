@@ -3,8 +3,16 @@ using Domain;
 
 namespace Persistence;
 
+/// <summary>
+/// Seeds the database with initial activity data.
+/// </summary>
 public class DbInitializer
 {
+    /// <summary>
+    /// Seeds activity data into the database if it is currently empty.
+    /// </summary>
+    /// <param name="context">The application's database context.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public static async Task SeedData(AppDbContext context)
     {
         // exit if there is already data

@@ -6,44 +6,60 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
+/// <summary>
+/// Entry point for the application. Configures and runs the web server.
+/// </summary>
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Configure services
 builder.Services.AddControllers();
+
+// Configure SQLite database context
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+// Enable CORS (cross-origin resource sharing)
 builder.Services.AddCors();
-builder.Services.AddMediatR( x =>
+
+// Add MediatR with pipeline behaviors
+builder.Services.AddMediatR(x =>
 {
     x.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>();
-    x.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    x.AddOpenBehavior(typeof(ValidationBehavior<,>)); // Register validation pipeline behavior
 });
+
+// Register AutoMapper profiles
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
+// Register FluentValidation validators
 builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
+
+// Register custom middleware
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-// Enable CORS between different endpoints
+// Configure middleware
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
-.WithOrigins("http://localhost:3000", "https://localhost:3000")); 
 
+// Set up CORS policy
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
+    .WithOrigins("http://localhost:3000", "https://localhost:3000")); 
+
+// Map controller endpoints
 app.MapControllers();
 
-// Create scope to access service provider
+// Seed database at startup
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 
-// Ensure database exists and includes seed data 
 try
 {
     var context = services.GetRequiredService<AppDbContext>();
-    await context.Database.MigrateAsync();
-    await DbInitializer.SeedData(context);
+    await context.Database.MigrateAsync(); // Apply any pending migrations
+    await DbInitializer.SeedData(context); // Seed initial data
 }
 catch (Exception ex)
 {
@@ -51,4 +67,5 @@ catch (Exception ex)
     logger.LogError(ex, "An error occurred during migration.");
 }
 
+// Run the application
 app.Run();

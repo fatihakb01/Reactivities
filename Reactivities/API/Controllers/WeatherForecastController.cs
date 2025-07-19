@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+// This is just an example file
+// Not directly used in our project
 [ApiController]
 [Route("[controller]")]
 // Go to http://localhost:5001/WeatherForecast to see that the API is working

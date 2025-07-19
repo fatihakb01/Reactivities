@@ -1,67 +1,92 @@
-import { Box, Button, Paper, TextField, Typography } from "@mui/material";
-import type { FormEvent } from "react";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import { useActivities } from "../../../lib/hooks/useActivities";
 import { useNavigate, useParams } from "react-router";
+import { useForm } from 'react-hook-form';
+import { useEffect } from "react";
+import { activitySchema, type ActivitySchema } from "../../../lib/schemas/activitySchema";
+import { zodResolver } from '@hookform/resolvers/zod';
+import TextInput from "../../../app/shared/components/TextInput";
+import SelectInput from "../../../app/shared/components/SelectInput";
+import { categoryOptions } from "./CategoryOptions";
+import DateTimeInput from "../../../app/shared/components/DateTimeInput";
+import LocationInput from "../../../app/shared/components/LocationInput";
 
-// Display form
+/**
+ * A form for creating or editing an activity.
+ * 
+ * Features:
+ * - Uses `react-hook-form` with Zod schema validation.
+ * - Pre-fills fields if editing an existing activity.
+ * - Handles submit by flattening location data and calling
+ *   `createActivity` or `updateActivity` mutations.
+ * - Includes custom input components (TextInput, SelectInput, DateTimeInput, LocationInput).
+ */
 export default function ActivityForm() {
+  const { control, reset, handleSubmit } = useForm<ActivitySchema>({
+    mode: 'onTouched',
+    resolver: zodResolver(activitySchema)
+  });
+  const navigate = useNavigate();
   const {id} = useParams();
   const {updateActivity, createActivity, activity, isLoadingActivity} = useActivities(id);
-  const navigate = useNavigate();
 
-  // Submit form when clicking on submit button 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-
-    // Turn off default behavior
-    event.preventDefault();
-
-    // Retrieve the form data
-    const formData = new FormData(event.currentTarget);
-    const data: {[key: string]: FormDataEntryValue} = {};
-
-    // The 'name' property inside each TextField is the key, and the entered value inside each field is the value
-    formData.forEach((value, key) => {
-        data[key] = value;
+  // Reset activity
+  useEffect(() => {
+    if (activity) reset({
+      ...activity,
+      location: {
+        city: activity.city,
+        venue: activity.venue,
+        latitude: activity.latitude,
+        longitude: activity.longitude
+      }
     });
+  }, [activity, reset]);
 
-    // Set activity id if activity exists
-    // Update activities/ create an activity after submitting form
-    if (activity) {
-      data.id = activity.id;
-      await updateActivity.mutateAsync(data as unknown as Activity); // cast to Activity type
-      navigate(`/activities/${activity.id}`);
-    } else {
-      createActivity.mutate(data as unknown as Activity, {
-        onSuccess: (id) => {
-          navigate(`/activities/${id}`);
-        }
-      }); 
+  /**
+   * Handles form submission.
+   * Flattens the nested location object into top-level fields
+   * before calling the appropriate mutation (create or update).
+   * @param data The validated activity form data
+   */
+  const onSubmit = async (data: ActivitySchema) => {
+    console.log(data);
+    const {location, ...rest} = data;
+    const flattenedData = {...rest, ...location};
+    try {
+      if (activity) {
+        updateActivity.mutate({...activity, ...flattenedData}, {
+          onSuccess: () => navigate(`/activities/${activity.id}`)
+        })
+      } else {
+        createActivity.mutate(flattenedData, {
+          onSuccess: (id) => navigate(`/activities/${id}`)
+        })
+      }
+    } catch (error) {
+      console.log(error);
     }
+  }
 
     // Show message while activity is loading
     if (isLoadingActivity) return <Typography>Loading activity...</Typography>
-
-    // Log the submitted activity
-    console.log("Submitting activity", data);
-  }
+  
 
   return (
     <Paper sx={{borderRadius: 3, padding: 3}}>
         <Typography variant="h5" gutterBottom color="primary">
             {activity ? 'Edit activity' : 'Create activity'}
         </Typography>
-        <Box component='form' onSubmit={handleSubmit} display='flex' flexDirection='column' gap={3}> 
-            <TextField name='title' label='Title' defaultValue={activity?.title}/>
-            <TextField name='description' label='Description' defaultValue={activity?.description} multiline rows={3}/>
-            <TextField name='category' label='Category' defaultValue={activity?.category}/>
-            <TextField name='date' label='Date' type="date" 
-              defaultValue={activity?.date
-                ? new Date(activity.date).toISOString().split('T')[0]
-                : new Date().toISOString().split('T')[0]
-              }
-            />
-            <TextField name='city' label='City' defaultValue={activity?.city}/>
-            <TextField name='venue' label='Venue' defaultValue={activity?.venue}/>
+        <Box component='form' onSubmit={handleSubmit(onSubmit)} display='flex' flexDirection='column' gap={3}> 
+            <TextInput label='Title' control={control} name='title' />
+            <TextInput label='Description' control={control} name='description' multiline rows={3} />
+
+            <Box display='flex' gap={3}>
+              <SelectInput items={categoryOptions} label='Category' control={control} name='category' />
+              <DateTimeInput label='Date' control={control} name='date' />
+            </Box>
+            <LocationInput control={control} label='Enter the location' name="location"></LocationInput>
+            
             <Box display='flex' justifyContent='end' gap={3}>
                 <Button color='inherit'>Cancel</Button>
                 <Button 
@@ -75,3 +100,4 @@ export default function ActivityForm() {
     </Paper>
   )
 }
+

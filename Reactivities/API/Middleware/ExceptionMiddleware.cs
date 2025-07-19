@@ -7,10 +7,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Middleware;
 
-// Return exceptions to the client
+/// <summary>
+/// Middleware to handle unhandled exceptions and return appropriate HTTP responses.
+/// Also processes FluentValidation exceptions with structured error details.
+/// </summary>
+/// <param name="logger">Logger for writing exception logs.</param>
+/// <param name="env">Hosting environment used to determine whether to show stack traces.</param>
 public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, IHostEnvironment env) 
     : IMiddleware
 {
+    /// <summary>
+    /// Main entry point for middleware execution.
+    /// Catches and handles exceptions thrown in the request pipeline.
+    /// </summary>
+    /// <param name="context">HTTP context for the current request.</param>
+    /// <param name="next">Delegate to invoke the next middleware component.</param>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         try
@@ -27,6 +38,11 @@ public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, IHostEnvir
         }
     }
 
+    /// <summary>
+    /// Handles generic exceptions and logs them.
+    /// </summary>
+    /// <param name="context">The current HTTP context.</param>
+    /// <param name="ex">The exception that occurred.</param>
     private async Task HandleException(HttpContext context, Exception ex)
     {
         logger.LogError(ex, ex.Message);
@@ -44,6 +60,11 @@ public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, IHostEnvir
         await context.Response.WriteAsync(json);
     }
 
+    /// <summary>
+    /// Handles FluentValidation exceptions and returns a structured 400 Bad Request response.
+    /// </summary>
+    /// <param name="context">The current HTTP context.</param>
+    /// <param name="ex">The validation exception that occurred.</param>
     private static async Task HandleValidationException(HttpContext context, ValidationException ex)
     {
         var validationErrors = new Dictionary<string, string[]>();

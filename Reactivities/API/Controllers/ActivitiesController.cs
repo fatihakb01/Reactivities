@@ -8,54 +8,66 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+/// <summary>
+/// API controller responsible for handling HTTP requests related to activities.
+/// Supports CRUD operations (Create, Read, Update, Delete).
+/// Inherits shared logic from BaseApiController, including access to the Mediator and result handling.
+/// </summary>
 public class ActivitiesController : BaseApiController
 {
-    // Return activities
-    // test using https://localhost:5001/api/activities
+    /// <summary>
+    /// Retrieves a list of all activities from the system.
+    /// </summary>
+    /// <returns>A list of <see cref="Activity"/> objects.</returns>
     [HttpGet]
     public async Task<ActionResult<List<Activity>>> GetActivities()
     {
         return await Mediator.Send(new GetActivityList.Query());
     }
 
-    // Return a specific activity based on id
-    // test using https://localhost:5001/api/activities/{id}
-    // e.g. https://localhost:5001/api/activities/0f6fc368-88c2-4b74-aa24-01b9a97f1de0
+    /// <summary>
+    /// Retrieves a specific activity by its unique ID.
+    /// </summary>
+    /// <param name="id">The ID of the activity to retrieve.</param>
+    /// <returns>The requested <see cref="Activity"/> if found; otherwise, an appropriate HTTP status.</returns>
     [HttpGet("{Id}")]
     public async Task<ActionResult<Activity>> GetActivityDetail(string id)
     {
-        //throw new Exception("Server test error");
         return HandleResult(await Mediator.Send(new GetActivityDetails.Query { Id = id }));
     }
 
-    // Creating a new activity
+    /// <summary>
+    /// Creates a new activity using the provided data transfer object.
+    /// </summary>
+    /// <param name="activityDto">The data used to create the new activity.</param>
+    /// <returns>A result containing the outcome of the creation operation.</returns>
     [HttpPost]
     public async Task<ActionResult<string>> CreateActivity(CreateActivityDto activityDto)
     {
         return HandleResult(await Mediator.Send(new CreateActivity.Command { ActivityDto = activityDto }));
     }
 
-    // Changing an activity
+    /// <summary>
+    /// Updates an existing activity using the provided data.
+    /// </summary>
+    /// <param name="activity">The updated activity data.</param>
+    /// <returns>Returns HTTP 204 No Content on success.</returns>
     [HttpPut]
     public async Task<ActionResult> EditActivity(EditActivityDto activity)
     {
         await Mediator.Send(new EditActivity.Command { ActivityDto = activity });
 
-        return NoContent(); // we need this because EditActivity.Command does not return anything
+        return NoContent();
     }
 
-    // Delete an activity
-    [HttpDelete("{id}")]
+    /// <summary>
+    /// Deletes an activity based on the provided ID.
+    /// </summary>
+    /// <param name="id">The ID of the activity to delete.</param>
+    /// <returns>A result indicating whether the deletion was successful.</returns>
+    [HttpDelete("{Id}")]
     public async Task<ActionResult> DeleteActivity(string id)
     {
         return HandleResult(await Mediator.Send(new DeleteActivity.Command { Id = id }));
-    } 
-    
-    //// Old fashion way (instead of public class ActivitiesController(AppDbContext context))
-    // private readonly AppDbContext context;
-
-    // public ActivitiesController(AppDbContext context)
-    // {
-    //     this.context = context;
-    // }
+    }
 }
