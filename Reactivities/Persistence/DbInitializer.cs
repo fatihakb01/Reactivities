@@ -1,22 +1,54 @@
 using System;
 using Domain;
+using Microsoft.AspNetCore.Identity;
 
 namespace Persistence;
 
 /// <summary>
-/// Seeds the database with initial activity data.
+/// Provides methods for seeding the database with initial data such as users and activities.
 /// </summary>
 public class DbInitializer
 {
     /// <summary>
-    /// Seeds activity data into the database if it is currently empty.
+    /// Seeds the database with initial users and activities if they do not already exist.
     /// </summary>
-    /// <param name="context">The application's database context.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static async Task SeedData(AppDbContext context)
+    /// <param name="context">
+    /// The <see cref="AppDbContext"/> used to access and modify the application's database.
+    /// </param>
+    /// <param name="userManager">
+    /// The <see cref="UserManager{TUser}"/> used to create and manage user accounts.
+    /// </param>
+    /// <returns>
+    /// A task that represents the asynchronous seeding operation.
+    /// </returns>
+    /// <remarks>
+    /// This method will:
+    /// <list type="bullet">
+    /// <item><description>Create a set of dummy users if no users currently exist.</description></item>
+    /// <item><description>Create and add a predefined list of activities if the database has no existing activities.</description></item>
+    /// <item><description>Save the new data to the database.</description></item>
+    /// </list>
+    /// </remarks>
+    public static async Task SeedData(AppDbContext context, UserManager<User> userManager)
     {
+        // Create dummy users if they don't exist
+        if (!userManager.Users.Any())
+        {
+            var users = new List<User>
+            {
+                new User{DisplayName = "Bob", UserName = "bob@test.com", Email = "bob@test.com"},
+                new User{DisplayName = "Tom", UserName = "tom@test.com", Email = "tom@test.com"},
+                new User{DisplayName = "Jane", UserName = "jane@test.com", Email = "jane@test.com"}
+            };
+
+            foreach (var user in users)
+            {
+                await userManager.CreateAsync(user, "Pa$$w0rd");
+            }
+        }
+
         // exit if there is already data
-        if (context.Activities.Any()) return;
+            if (context.Activities.Any()) return;
 
         // Define activities
         var activities = new List<Activity>

@@ -144,3 +144,8 @@ Difference between .ts & .tsx files
 - Install the following:
     1. npm install react-leaflet@next
     2. npm install -D @types/leaflet
+
+122. Adding the user entity
+- NUGET install: Microsoft.AspNetCore.Identity.EntityFrameworkCore version 9.0.1.
+- dotnet ef migrations add IdentityAdded -p Persistence -s API
+- This makes sure that the user databases are added as well.

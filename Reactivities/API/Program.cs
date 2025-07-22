@@ -2,7 +2,11 @@ using API.Middleware;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
+using Domain;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -12,7 +16,11 @@ using Persistence;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure services
-builder.Services.AddControllers();
+builder.Services.AddControllers(opt =>
+{
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    opt.Filters.Add(new AuthorizeFilter(policy));
+});
 
 // Configure SQLite database context
 builder.Services.AddDbContext<AppDbContext>(opt =>
@@ -39,6 +47,14 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 // Register custom middleware
 builder.Services.AddTransient<ExceptionMiddleware>();
 
+// Register identity tables
+builder.Services.AddIdentityApiEndpoints<User>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<AppDbContext>();
+
 var app = builder.Build();
 
 // Configure middleware
@@ -46,10 +62,16 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 // Set up CORS policy
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
-    .WithOrigins("http://localhost:3000", "https://localhost:3000")); 
+    .AllowCredentials()
+    .WithOrigins("http://localhost:3000", "https://localhost:3000"));
+
+// Authenticate & authorize users
+app.UseAuthentication();
+app.UseAuthentication();
 
 // Map controller endpoints
 app.MapControllers();
+app.MapGroup("api").MapIdentityApi<User>();
 
 // Seed database at startup
 using var scope = app.Services.CreateScope();
@@ -58,8 +80,9 @@ var services = scope.ServiceProvider;
 try
 {
     var context = services.GetRequiredService<AppDbContext>();
+    var userManager = services.GetRequiredService<UserManager<User>>();
     await context.Database.MigrateAsync(); // Apply any pending migrations
-    await DbInitializer.SeedData(context); // Seed initial data
+    await DbInitializer.SeedData(context, userManager); // Seed initial data
 }
 catch (Exception ex)
 {
