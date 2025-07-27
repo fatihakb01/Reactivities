@@ -44,8 +44,6 @@ public class CreateActivity
         {
             var activity = mapper.Map<Activity>(request.ActivityDto);
 
-            System.Console.WriteLine(request.ActivityDto);
-
             context.Activities.Add(activity);
 
             var result = await context.SaveChangesAsync(cancellationToken) > 0;

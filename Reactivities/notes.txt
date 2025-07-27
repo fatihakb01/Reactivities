@@ -67,6 +67,7 @@ Some dotnet commands:
 - In the vite.config.ts, you should specify:
     - import mkcert from 'vite-plugin-mkcert'
     - inside the plugins property: mkcert()
+- To make sure that your back-end also trusts the certificate, you should use the following command 'dotnet dev-certs https --trust'
 
 25. Adding Axios for data fetching
 - Axios is a library to fetch data and this will be used to replace the fetch method of javascript.

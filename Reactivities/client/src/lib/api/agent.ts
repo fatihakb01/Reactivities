@@ -12,7 +12,8 @@ const sleep = (delay: number) => {
 
 // define base url
 const agent = axios.create({
-    baseURL: import.meta.env.VITE_API_URL
+    baseURL: import.meta.env.VITE_API_URL,
+    withCredentials: true
 });
 
 // Show a loading functionality while waiting for a request

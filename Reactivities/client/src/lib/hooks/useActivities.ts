@@ -1,51 +1,62 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../api/agent";
 import { useLocation } from "react-router";
-import type { Activity } from "../types";
+import { useAccount } from "./useAccount";
 
 /**
- * Custom hook for fetching and mutating activity data.
- * 
- * @param id - Optional ID of a specific activity. If provided, the hook will also fetch that activity.
- * @returns An object containing:
- * - `activities`: A list of all activities (if `id` not provided)
- * - `activity`: A single activity (if `id` provided)
- * - `isPending`: Whether the activities list is still loading
- * - `isLoadingActivity`: Whether a single activity is still loading
- * - `updateActivity`: Mutation function for updating activities
- * - `createActivity`: Mutation function for creating activities
- * - `deleteActivity`: Mutation function for deleting activities
+ * React hook for managing activities (list, detail, create, update, delete)
+ * using React Query for data fetching, caching, and invalidation.
  *
- * Internally, this hook uses React Query to:
- * - Cache results
- * - Invalidate queries after mutations to refresh data
+ * Features:
+ * - Fetches a list of activities (when `id` is not provided)
+ * - Fetches a single activity (when `id` is provided)
+ * - Provides mutations for creating, updating, and deleting activities
+ * - Automatically invalidates and refreshes the activity list after mutations
+ * - Only fetches when a user is authenticated (via `useAccount`)
+ * - Fetching is context‑aware: list fetch only triggers on `/activities` route
+ *
+ * @param id Optional activity ID. When provided, the hook fetches details
+ *           of that specific activity instead of the entire list.
+ *
+ * @returns An object with:
+ *  - `activities`: Activity[] | undefined – all activities
+ *  - `activity`: Activity | undefined – details of a single activity
+ *  - `isLoading`: boolean – whether the list is loading
+ *  - `isLoadingActivity`: boolean – whether the single activity is loading
+ *  - `createActivity`: mutation object to create a new activity
+ *  - `updateActivity`: mutation object to update an existing activity
+ *  - `deleteActivity`: mutation object to delete an activity
+ *
+ * Example usage:
+ * ```tsx
+ * const { activities, isLoading, createActivity } = useActivities();
+ * // or for detail:
+ * const { activity, isLoadingActivity } = useActivities('some-id');
+ * ```
  */
 export const useActivities = (id?: string) => {
     const queryClient = useQueryClient();
+    const {currentUser} = useAccount();
     const location = useLocation();
 
-    // Fetch list of activities (only when not viewing a specific one)
-    const {data: activities, isPending} = useQuery({
+    const {data: activities, isLoading} = useQuery({
         queryKey: ['activities'],
         queryFn: async () => {
         const response = await agent.get<Activity[]>('/activities');
         return response.data;
         },
-        enabled: !id && location.pathname === '/activities'
-        // staleTime: 1000 * 6 * 5 // The time it takes before an activity is marked as stale (default stale time is 0)
+        enabled: !id && location.pathname === '/activities' && !!currentUser
     });
 
-    // Fetch a single activity when id is provided
     const {data: activity, isLoading: isLoadingActivity} = useQuery({
         queryKey: ['activities', id],
         queryFn: async () => {
             const response = await agent.get<Activity>(`/activities/${id}`);
             return response.data;
         },
-        enabled: !!id // if id is not available, then don't send request to api, otherwise send request to api
+        enabled: !!id && !!currentUser 
     });
 
-    // Mutation to update an existing activity
     const updateActivity = useMutation({
         mutationFn: async (activity: Activity) => {
             await agent.put('/activities', activity);
@@ -57,7 +68,6 @@ export const useActivities = (id?: string) => {
         }
     });
 
-    // Mutation to create a new activity
     const createActivity = useMutation({
         mutationFn: async (activity: Activity) => {
             const response = await agent.post('/activities', activity);
@@ -70,7 +80,6 @@ export const useActivities = (id?: string) => {
         }
     });    
 
-    // Mutation to delete an activity
     const deleteActivity = useMutation({
         mutationFn: async (id: string) => {
             await agent.delete(`/activities/${id}`);
@@ -84,25 +93,11 @@ export const useActivities = (id?: string) => {
 
     return {
         activities,
-        isPending,
+        isLoading,
         updateActivity,
         createActivity,
         deleteActivity,
         activity,
         isLoadingActivity
     }
-
-    // Fetch activities data from api 
-    // Use axios.get instead of fetch
-    // useEffect(() => {
-    //   axios.get<Activity []>('https://localhost:5001/api/activities')
-    //   .then(response => setActivities(response.data)) // update state with newly retrieved data
-    // }, []);
-
-    //// Previously used code
-    // useEffect(() => {
-    //   fetch('https://localhost:5001/api/activities')
-    //   .then(response => response.json()) // retrieve data
-    //   .then(data => setActivities(data)) // update state with newly retrieved data
-    // }, [])
 }

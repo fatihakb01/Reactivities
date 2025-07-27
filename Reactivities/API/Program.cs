@@ -61,13 +61,16 @@ var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
 
 // Set up CORS policy
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
+app.UseCors(x => x
+    .AllowAnyHeader()
+    .AllowAnyMethod()
     .AllowCredentials()
-    .WithOrigins("http://localhost:3000", "https://localhost:3000"));
+    .WithOrigins("https://localhost:3000") //"http://localhost:3000"
+); 
 
 // Authenticate & authorize users
 app.UseAuthentication();
-app.UseAuthentication();
+app.UseAuthorization();
 
 // Map controller endpoints
 app.MapControllers();
