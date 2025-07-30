@@ -1,7 +1,10 @@
 using System;
+using Application.Activities.DTO;
 using Application.Core;
-using Domain;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Activities.Queries;
@@ -14,7 +17,7 @@ public class GetActivityDetails
     /// <summary>
     /// Query object containing the ID of the activity to retrieve.
     /// </summary>
-    public class Query : IRequest<Result<Activity>>
+    public class Query : IRequest<Result<ActivityDto>>
     {
         /// <summary>
         /// The ID of the activity to fetch.
@@ -26,7 +29,7 @@ public class GetActivityDetails
     /// Handler for processing the GetActivityDetails query.
     /// </summary>
     /// <param name="context">The application's database context.</param>
-    public class Handler(AppDbContext context) : IRequestHandler<Query, Result<Activity>>
+    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<ActivityDto>>
     {
         /// <summary>
         /// Handles the query and retrieves the specified activity.
@@ -34,13 +37,15 @@ public class GetActivityDetails
         /// <param name="request">The query containing the activity ID.</param>
         /// <param name="cancellationToken">A token to cancel the operation.</param>
         /// <returns>A result object containing the activity or an error.</returns>
-        public async Task<Result<Activity>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var activity = await context.Activities.FindAsync([request.Id], cancellationToken);
+            var activity = await context.Activities
+                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(x => request.Id == x.Id, cancellationToken);
 
-            if (activity == null) return Result<Activity>.Failure("Activity not found", 404);
+            if (activity == null) return Result<ActivityDto>.Failure("Activity not found", 404);
 
-            return Result<Activity>.Success(activity);
+            return Result<ActivityDto>.Success(activity);
         }
     }
 }

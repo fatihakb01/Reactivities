@@ -23,4 +23,9 @@ public class User : IdentityUser
     /// A URL pointing to the user's profile image.
     /// </summary>
     public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// Navigation property for the related <see cref="Activities"/>.
+    /// </summary>
+    public ICollection<ActivityAttendee> Activities { get; set; } = [];
 }

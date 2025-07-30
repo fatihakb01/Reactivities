@@ -2,8 +2,10 @@ using API.Middleware;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -11,18 +13,20 @@ using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 /// <summary>
-/// Entry point for the application. Configures and runs the web server.
+/// Entry point for the application. Configures services, middleware, and database initialization.
 /// </summary>
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure services
+#region Configure Services
+
+// Add controllers with a global authorization policy (require authenticated user by default)
 builder.Services.AddControllers(opt =>
 {
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     opt.Filters.Add(new AuthorizeFilter(policy));
 });
 
-// Configure SQLite database context
+// Configure the database context using SQLite and the connection string from configuration
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -38,6 +42,9 @@ builder.Services.AddMediatR(x =>
     x.AddOpenBehavior(typeof(ValidationBehavior<,>)); // Register validation pipeline behavior
 });
 
+// Register the current user accessor service
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+
 // Register AutoMapper profiles
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
@@ -47,7 +54,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 // Register custom middleware
 builder.Services.AddTransient<ExceptionMiddleware>();
 
-// Register identity tables
+// Register ASP.NET Core Identity for user and role management
 builder.Services.AddIdentityApiEndpoints<User>(opt =>
 {
     opt.User.RequireUniqueEmail = true;
@@ -55,12 +62,28 @@ builder.Services.AddIdentityApiEndpoints<User>(opt =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>();
 
+// Configure custom authorization policy for activity hosts
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("IsActivityHost", policy =>
+    {
+        policy.Requirements.Add(new IsHostRequirement());
+    });
+});
+
+// Register the custom authorization handler for the "IsActivityHost" policy
+builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
+
+#endregion
+
 var app = builder.Build();
 
-// Configure middleware
+#region Configure Middleware
+
+// Use custom exception-handling middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
-// Set up CORS policy
+// Configure CORS to allow requests from the React client
 app.UseCors(x => x
     .AllowAnyHeader()
     .AllowAnyMethod()
@@ -68,15 +91,21 @@ app.UseCors(x => x
     .WithOrigins("https://localhost:3000") //"http://localhost:3000"
 ); 
 
-// Authenticate & authorize users
+// Enable authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Map controller endpoints
 app.MapControllers();
+
+// Map Identity API endpoints under the "api" route
 app.MapGroup("api").MapIdentityApi<User>();
 
-// Seed database at startup
+#endregion
+
+#region Database Initialization
+
+// Seed database with initial data during application startup
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 
@@ -84,8 +113,8 @@ try
 {
     var context = services.GetRequiredService<AppDbContext>();
     var userManager = services.GetRequiredService<UserManager<User>>();
-    await context.Database.MigrateAsync(); // Apply any pending migrations
-    await DbInitializer.SeedData(context, userManager); // Seed initial data
+    await context.Database.MigrateAsync(); // Apply pending EF Core migrations
+    await DbInitializer.SeedData(context, userManager); // Seed default users and activities
 }
 catch (Exception ex)
 {
@@ -93,5 +122,7 @@ catch (Exception ex)
     logger.LogError(ex, "An error occurred during migration.");
 }
 
-// Run the application
+#endregion
+
+// Start the application
 app.Run();

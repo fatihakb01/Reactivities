@@ -21,7 +21,7 @@ public class ActivitiesController : BaseApiController
     /// </summary>
     /// <returns>A list of <see cref="Activity"/> objects.</returns>
     [HttpGet]
-    public async Task<ActionResult<List<Activity>>> GetActivities()
+    public async Task<ActionResult<List<ActivityDto>>> GetActivities()
     {
         return await Mediator.Send(new GetActivityList.Query());
     }
@@ -32,7 +32,7 @@ public class ActivitiesController : BaseApiController
     /// <param name="id">The ID of the activity to retrieve.</param>
     /// <returns>The requested <see cref="Activity"/> if found; otherwise, an appropriate HTTP status.</returns>
     [HttpGet("{Id}")]
-    public async Task<ActionResult<Activity>> GetActivityDetail(string id)
+    public async Task<ActionResult<ActivityDto>> GetActivityDetail(string id)
     {
         return HandleResult(await Mediator.Send(new GetActivityDetails.Query { Id = id }));
     }
@@ -53,12 +53,12 @@ public class ActivitiesController : BaseApiController
     /// </summary>
     /// <param name="activity">The updated activity data.</param>
     /// <returns>Returns HTTP 204 No Content on success.</returns>
-    [HttpPut]
-    public async Task<ActionResult> EditActivity(EditActivityDto activity)
+    [HttpPut("{id}")]
+    [Authorize(Policy = "IsActivityHost")]
+    public async Task<ActionResult> EditActivity(string id, EditActivityDto activity)
     {
-        await Mediator.Send(new EditActivity.Command { ActivityDto = activity });
-
-        return NoContent();
+        activity.Id = id;
+        return HandleResult(await Mediator.Send(new EditActivity.Command { ActivityDto = activity }));
     }
 
     /// <summary>
@@ -67,8 +67,22 @@ public class ActivitiesController : BaseApiController
     /// <param name="id">The ID of the activity to delete.</param>
     /// <returns>A result indicating whether the deletion was successful.</returns>
     [HttpDelete("{Id}")]
+    [Authorize(Policy = "IsActivityHost")]
     public async Task<ActionResult> DeleteActivity(string id)
     {
         return HandleResult(await Mediator.Send(new DeleteActivity.Command { Id = id }));
+    }
+
+    /// <summary>
+    /// Toggles the current user's attendance for the specified activity.
+    /// If the user is not attending, they are added. If they are already attending, they are removed.
+    /// If the user is the host, this action toggles the activity's cancellation status.
+    /// </summary>
+    /// <param name="id">The ID of the activity to attend or leave.</param>
+    /// <returns>A result indicating whether the attendance was successfully updated.</returns>
+    [HttpPost("{id}/attend")]
+    public async Task<ActionResult> Attend(string id)
+    {
+        return HandleResult(await Mediator.Send(new UpdateAttendance.Command { Id = id }));
     }
 }

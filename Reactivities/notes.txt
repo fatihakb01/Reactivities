@@ -150,3 +150,18 @@ Difference between .ts & .tsx files
 - NUGET install: Microsoft.AspNetCore.Identity.EntityFrameworkCore version 9.0.1.
 - dotnet ef migrations add IdentityAdded -p Persistence -s API
 - This makes sure that the user databases are added as well.
+
+140. Configuring the relationship
+- In order to configure a many-to-many relationship between Users and Activities, 
+you can use the following command = dotnet-ef migrations add ActivityAttendeesAdded -p Persistence -s API
+- However, this provides limitations because you can't add your own properties.
+- Therefore, we created our own join class, called ActivityAttendee.cs and then used the command above.
+- Install dotnet-ef if not installed already: dotnet tool install --global dotnet-ef.
+
+141. Creating the infrastructure project
+- dotnet new classlib -n Infrastructure
+- dotnet sln add Infrastructure
+
+149. Updating the seed data
+- We drop our database in order to update the seed data (see command below).
+- dotnet ef database drop -p Persistence -s API

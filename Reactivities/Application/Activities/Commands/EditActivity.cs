@@ -39,7 +39,8 @@ public class EditActivity
         /// <returns>A result indicating success or failure.</returns>
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var activity = await context.Activities.FindAsync([request.ActivityDto.Id], cancellationToken);
+            var activity = await context.Activities
+                .FindAsync([request.ActivityDto.Id], cancellationToken);
 
             if (activity == null) return Result<Unit>.Failure("Activity not found", 404);
 

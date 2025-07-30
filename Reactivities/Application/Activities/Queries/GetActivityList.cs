@@ -1,4 +1,7 @@
 using System;
+using Application.Activities.DTO;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -15,13 +18,13 @@ public class GetActivityList
     /// <summary>
     /// Query object used to request a list of activities.
     /// </summary>
-    public class Query : IRequest<List<Activity>> { }
+    public class Query : IRequest<List<ActivityDto>> { }
 
     /// <summary>
     /// Handler for processing the GetActivityList query.
     /// </summary>
     /// <param name="context">The application's database context.</param>
-    public class Handler(AppDbContext context) : IRequestHandler<Query, List<Activity>>
+    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, List<ActivityDto>>
     {
         /// <summary>
         /// Handles the query and retrieves all activities from the database.
@@ -29,9 +32,11 @@ public class GetActivityList
         /// <param name="request">The query request (unused in this case).</param>
         /// <param name="cancellationToken">A token to cancel the operation.</param>
         /// <returns>A list of all activities.</returns>
-        public async Task<List<Activity>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<List<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
         {
-            return await context.Activities.ToListAsync(cancellationToken);
+            return await context.Activities
+                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
         }
     }
 }

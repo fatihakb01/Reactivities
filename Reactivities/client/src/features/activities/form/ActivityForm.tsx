@@ -22,9 +22,20 @@ import LocationInput from "../../../app/shared/components/LocationInput";
  * - Includes custom input components (TextInput, SelectInput, DateTimeInput, LocationInput).
  */
 export default function ActivityForm() {
-  const { control, reset, handleSubmit } = useForm<ActivitySchema>({
+  const { control, reset, handleSubmit, setError } = useForm<ActivitySchema>({
     mode: 'onTouched',
-    resolver: zodResolver(activitySchema)
+    resolver: zodResolver(activitySchema),
+    defaultValues: {
+      title: '',         
+      description: '',   
+      category: '',      
+      location: {
+        venue: '',       
+        city: '',        
+        latitude: undefined,     
+        longitude: undefined,
+      }
+    }
   });
   const navigate = useNavigate();
   const {id} = useParams();
@@ -56,11 +67,25 @@ export default function ActivityForm() {
     try {
       if (activity) {
         updateActivity.mutate({...activity, ...flattenedData}, {
-          onSuccess: () => navigate(`/activities/${activity.id}`)
+          onSuccess: () => navigate(`/activities/${activity.id}`),
+          onError: (error) => {
+            if (Array.isArray(error)) {
+                error.forEach(err => {
+                    if (err.includes('Date')) setError('date', {message: err});
+                })
+            }
+        }
         })
       } else {
         createActivity.mutate(flattenedData, {
-          onSuccess: (id) => navigate(`/activities/${id}`)
+          onSuccess: (id) => navigate(`/activities/${id}`),
+          onError: (error) => {
+            if (Array.isArray(error)) {
+                error.forEach(err => {
+                    if (err.includes('Date')) setError('date', {message: err});
+                })
+            }
+        }
         })
       }
     } catch (error) {
@@ -100,4 +125,3 @@ export default function ActivityForm() {
     </Paper>
   )
 }
-

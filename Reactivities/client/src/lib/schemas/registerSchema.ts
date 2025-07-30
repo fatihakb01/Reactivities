@@ -8,7 +8,7 @@ import { requiredString } from "../util/util";
  *
  * Fields:
  * - `email`: Must be a valid email address.
- * - `displayName`: Required string, maximum length of 15 characters.
+ * - `displayName`: Required string, minimum length of 2 characters, maximum length of 15 characters.
  * - `password`: Required string (validated by `requiredString` utility).
  *
  * Usage:
@@ -16,7 +16,7 @@ import { requiredString } from "../util/util";
  */
 export const registerSchema = z.object({
     email: z.email(),
-    displayName: requiredString('displayName').max(15),
+    displayName: requiredString('displayName').min(2).max(15),
     password: requiredString('password'),
 })
 

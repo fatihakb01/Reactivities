@@ -1,16 +1,17 @@
 using System;
+using Application.Profiles.DTOs;
 
-namespace Domain;
+namespace Application.Activities.DTO;
 
 /// <summary>
-/// Represents the Activity domain model.
+/// Represents the data transfer object for an activity exposed to the client.
 /// </summary>
-public class Activity
+public class ActivityDto
 {
     /// <summary>
     /// Unique identifier for the activity.
     /// </summary>
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public required string Id { get; set; }
 
     /// <summary>
     /// Title of the activity.
@@ -37,6 +38,16 @@ public class Activity
     /// </summary>
     public bool IsCancelled { get; set; }
 
+    /// <summary>
+    /// Display name of the user who is hosting the activity.
+    /// </summary>
+    public required string HostDisplayName { get; set; }
+
+    /// <summary>
+    /// Unique identifier of the host user.
+    /// </summary>
+    public required string HostId { get; set; }
+
     // Location information
 
     /// <summary>
@@ -60,7 +71,7 @@ public class Activity
     public double Longitude { get; set; }
 
     /// <summary>
-    /// Navigation property for the related <see cref="Attendees"/>.
+    /// A collection of users attending the activity.
     /// </summary>
-    public ICollection<ActivityAttendee> Attendees { get; set; } = [];
+    public ICollection<UserProfile> Attendees { get; set; } = [];
 }
