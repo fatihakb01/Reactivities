@@ -33,13 +33,16 @@ export default function LoginForm() {
   const location = useLocation();
   const {control, handleSubmit, formState: { isValid, isSubmitting }} = useForm<LoginSchema>({
     mode: 'onTouched',
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
   });
 
   const onSubmit = async (data: LoginSchema) => {
     await loginUser.mutateAsync(data, {
       onSuccess: () => {
-        console.log(location.state?.from)
         navigate(location.state?.from || '/activities')
       }
     });

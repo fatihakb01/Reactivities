@@ -1,7 +1,6 @@
 import { CalendarToday, Info, Place } from "@mui/icons-material";
 import { Box, Button, Divider, Grid, Paper, Typography } from "@mui/material";
 import { formatDate } from "../../../lib/util/util";
-import type { Activity } from "../../../lib/types";
 import { useState } from "react";
 import MapComponent from "../../../app/shared/components/MapComponent";
 
@@ -9,6 +8,23 @@ type Props = {
     activity: Activity
 }
 
+/**
+ * Displays general information about the given activity, such as description, date,
+ * venue, and an optional embedded map toggle.
+ *
+ * Props:
+ * @param {Activity} props.activity - The activity object to display details for
+ *
+ * Features:
+ * - Shows activity description, formatted date, and location
+ * - Toggles a map display (via `MapComponent`) on button click
+ * - Responsive layout using MUI Grid and Paper components
+ * 
+ * Usage:
+ * ```tsx
+ * <ActivityDetailsInfo activity={selectedActivity} />
+ * ```
+ */
 export default function ActivityDetailsInfo({activity}: Props) {
     const [mapOpen, setMapOpen] = useState(false);
 
@@ -42,7 +58,7 @@ export default function ActivityDetailsInfo({activity}: Props) {
                     <Typography>
                         {activity.venue}, {activity.city}
                     </Typography>
-                    <Button onClick={() => setMapOpen(!mapOpen)}>
+                    <Button sx={{whiteSpace: 'nowrap', mx: 2}} onClick={() => setMapOpen(!mapOpen)}>
                         {mapOpen ? 'Hide map' : 'Show map'}
                     </Button>
                 </Grid>

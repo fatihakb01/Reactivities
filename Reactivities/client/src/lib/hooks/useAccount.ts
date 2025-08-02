@@ -77,8 +77,7 @@ export const useAccount = () => {
             return response.data;
         },
         enabled: !queryClient.getQueryData(['user']) 
-            && location.pathname !== '/login'
-            && location.pathname !== '/register'
+                && location.pathname !== '/register'
     });
 
     return {

@@ -6,18 +6,41 @@ import ActivityDetailsInfo from "./ActivityDetailsInfo";
 import ActivityDetailsChat from "./ActivityDetailsChat";
 import ActivityDetailsSidebar from "./ActivityDetailsSidebar";
 
-// Display the activity details (next to the activity dashboard)
+/**
+ * Displays the detailed view of a single activity.
+ *
+ * Features:
+ * - Retrieves an activity by its `id` from the URL params using `useParams`.
+ * - Fetches activity data using the `useActivities` hook.
+ * - Shows loading and not-found fallback messages appropriately.
+ * - Renders subcomponents to display:
+ *    - Header information (`ActivityDetailsHeader`)
+ *    - Description and location details (`ActivityDetailsInfo`)
+ *    - Comment/chat section (`ActivityDetailsChat`)
+ *    - Sidebar with attendees and management buttons (`ActivityDetailsSidebar`)
+ *
+ * Behavior:
+ * - If the activity is still loading, it shows a loading message.
+ * - If no activity is found, it displays an error message.
+ *
+ * Layout:
+ * - Uses a two-column grid layout with 8:4 ratio for main content and sidebar.
+ *
+ * Dependencies:
+ * - Relies on routing (`useParams`) and the activity-fetching hook (`useActivities(id)`).
+ *
+ * Usage:
+ * ```tsx
+ * <Route path="/activities/:id" element={<ActivityDetailPage />} />
+ * ```
+ */
 export default function ActivityDetailPage() {
-   // Find the activity that has been changed 
    const {id} = useParams();
    const {activity, isLoadingActivity} = useActivities(id);
 
-   // Check whether activity can be found and show a temporary message 
    if (isLoadingActivity) return <Typography>Loading...</Typography>
    if (!activity) return <Typography>Activity not found...</Typography>
 
-  // In the edit & cancel buttons, you can either use the navigate component inside the onClick property
-  // or use the Link component inside the component property, which achieves the same behavior 
   return (
     <Grid container spacing={3}>
         <Grid size={8}>
@@ -26,7 +49,7 @@ export default function ActivityDetailPage() {
             <ActivityDetailsChat />
         </Grid>
         <Grid size={4}>
-            <ActivityDetailsSidebar />
+            <ActivityDetailsSidebar activity={activity}/>
         </Grid>
     </Grid>
   )

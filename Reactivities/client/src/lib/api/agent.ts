@@ -3,34 +3,46 @@ import { store } from "../stores/store";
 import { toast } from "react-toastify";
 import { router } from "../../app/router/Routes";
 
-// delay function
+/**
+ * Simulates an artificial delay.
+ * Useful for testing UI loading states or slow network simulation.
+ * @param delay - Time in milliseconds to wait.
+ * @returns A promise that resolves after the specified delay.
+ */
 const sleep = (delay: number) => {
     return new Promise(resolve => {
         setTimeout(resolve, delay)
     });
 }
 
-// define base url
+// Create Axios instance with default settings
 const agent = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true
 });
 
-// Show a loading functionality while waiting for a request
+/**
+ * Request interceptor.
+ * - Triggers `isBusy()` on every outgoing request to set UI loading state.
+ */
 agent.interceptors.request.use(config => {
     store.uiStore.isBusy();
     return config;
 })
 
-// Target the response and delay it with 1 second
+/**
+ * Response interceptor.
+ * - On success: delays response and resets loading state.
+ * - On error: handles global HTTP errors and routing.
+ */
 agent.interceptors.response.use(
     async response => {
-        await sleep(1000);
+        await sleep(0);
         store.uiStore.isIdle();
         return response;
     },
     async error => {
-        await sleep(1000);
+        await sleep(0);
         store.uiStore.isIdle();
         const {status, data} = error.response;
         switch (status) {
