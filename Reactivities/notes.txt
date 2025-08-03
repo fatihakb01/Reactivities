@@ -165,3 +165,14 @@ you can use the following command = dotnet-ef migrations add ActivityAttendeesAd
 149. Updating the seed data
 - We drop our database in order to update the seed data (see command below).
 - dotnet ef database drop -p Persistence -s API
+
+163. Adding the image service
+- Install CloudinaryDotNet with NuGet.
+- Add CloudinarySettings inside appSettings.json.
+- Create CloudinarySettings.cs class.
+Add CloudinarySettings as a service inside Program.cs.
+
+165. Creating a photo entity
+- We added Photo as a Dbset inside our AppDbContext.cs.
+- Therefore we need to use the following command: 
+    - dotnet ef migrations add PhotoEntityAdded -p Persistence -s API

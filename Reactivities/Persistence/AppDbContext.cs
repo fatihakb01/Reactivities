@@ -1,4 +1,5 @@
 using System;
+using System.Dynamic;
 using Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -6,11 +7,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Persistence;
 
 /// <summary>
-/// The application's primary database context, extending IdentityDbContext to support authentication.
+/// The application's primary Entity Framework database context, including identity and domain entities.
 /// </summary>
 /// <remarks>
-/// Manages database access for application entities and identity-related tables.
-/// Configures relationships and keys using Fluent API.
+/// Inherits from <see cref="IdentityDbContext{TUser}"/> to include support for ASP.NET Identity.
 /// </remarks>
 public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(options)
 {
@@ -18,11 +18,16 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(op
     /// Gets or sets the table of <see cref="Activity"/> entities in the database.
     /// </summary>
     public required DbSet<Activity> Activities { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the table of <see cref="ActivityAttendee"/> join entities.
     /// </summary>
     public required DbSet<ActivityAttendee> ActivityAttendees { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of uploaded user photos.
+    /// </summary>
+    public required DbSet<Photo> Photos { get; set; }
 
     /// <summary>
     /// Configures the entity relationships and keys using Fluent API.

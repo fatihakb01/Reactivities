@@ -5,6 +5,7 @@ using Application.Core;
 using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Photos;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -45,6 +46,9 @@ builder.Services.AddMediatR(x =>
 // Register the current user accessor service
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
+// Register the photo service
+builder.Services.AddScoped<IPhotoService, PhotoService>();
+
 // Register AutoMapper profiles
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
@@ -73,6 +77,10 @@ builder.Services.AddAuthorization(opt =>
 
 // Register the custom authorization handler for the "IsActivityHost" policy
 builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
+
+// Register the cloudinary settings
+builder.Services.Configure<CloudinarySettings>(builder.Configuration
+    .GetSection("CloudinarySettings"));
 
 #endregion
 

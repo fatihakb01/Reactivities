@@ -28,4 +28,9 @@ public class User : IdentityUser
     /// Navigation property for the related <see cref="Activities"/>.
     /// </summary>
     public ICollection<ActivityAttendee> Activities { get; set; } = [];
+
+    /// <summary>
+    /// Navigation property for the related <see cref="Photos"/>.
+    /// </summary>
+    public ICollection<Photo> Photos { get; set; } = [];
 }
