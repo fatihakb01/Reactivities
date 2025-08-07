@@ -176,3 +176,11 @@ Add CloudinarySettings as a service inside Program.cs.
 - We added Photo as a Dbset inside our AppDbContext.cs.
 - Therefore we need to use the following command: 
     - dotnet ef migrations add PhotoEntityAdded -p Persistence -s API
+
+181. Adding React Dropzone
+- Install: npm install --save react-dropzone.
+- This will help with drag & dropping images inside the profile page (photo section).
+
+182. Adding React Cropper
+- Install: npm install react-cropper.
+- This will help with resizing images during an upload.
