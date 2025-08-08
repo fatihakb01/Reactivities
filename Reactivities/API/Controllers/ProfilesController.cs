@@ -56,6 +56,21 @@ public class ProfilesController : BaseApiController
     }
 
     /// <summary>
+    /// Updates the display name and biography of the currently authenticated user.
+    /// </summary>
+    /// <param name="command">
+    /// A <see cref="EditProfile.Command"/> containing the updated display name and biography.
+    /// </param>
+    /// <returns>
+    /// An HTTP 200 OK status if the update succeeds, or an error response if it fails.
+    /// </returns>
+    [HttpPut]
+    public async Task<ActionResult> UpdateProfile(EditProfile.Command command)
+    {
+        return HandleResult(await Mediator.Send(command));
+    }
+
+    /// <summary>
     /// Retrieves a full user profile, including bio and photo information.
     /// </summary>
     /// <param name="userId">The ID of the user whose profile is being requested.</param>

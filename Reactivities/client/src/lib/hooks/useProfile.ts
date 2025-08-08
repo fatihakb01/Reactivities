@@ -1,28 +1,33 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../api/agent";
 import { useMemo } from "react";
+import type { EditProfileSchema } from "../schemas/editProfileSchema";
 
 /**
- * React hook for retrieving and managing a user's profile and their photos.
+ * React hook for retrieving, updating, and managing a user's profile and their photos.
  *
  * Features:
  * - Fetches profile and photo data for a given user ID.
- * - Supports uploading, setting main, and deleting profile photos.
- * - Updates both the global user and profile cache on mutations.
- * - Detects if the given profile belongs to the current user.
+ * - Supports uploading, setting main, deleting profile photos, and updating profile details.
+ * - Updates both the global user cache and profile cache on mutations.
+ * - Detects if the given profile belongs to the current logged-in user.
  *
  * @param {string} [id] - The profile ID to fetch and operate on.
  *
- * @returns {{
- *   profile: Profile | undefined,
- *   loadingProfile: boolean,
- *   photos: Photo[] | undefined,
- *   loadingPhotos: boolean,
- *   isCurrentUser: boolean,
- *   uploadPhoto: UseMutationResult<Photo, unknown, Blob>,
- *   setMainPhoto: UseMutationResult<void, unknown, Photo>,
- *   deletePhoto: UseMutationResult<void, unknown, string>
- * }}
+ * @returns {Object} Hook result object.
+ * @returns {Profile | undefined} [return.profile] - The profile data for the given ID.
+ * @returns {boolean} [return.loadingProfile] - Whether the profile is currently loading.
+ * @returns {Photo[] | undefined} [return.photos] - The list of profile photos for the user.
+ * @returns {boolean} [return.loadingPhotos] - Whether the photos are currently loading.
+ * @returns {boolean} [return.isCurrentUser] - Whether the profile belongs to the current logged-in user.
+ * @returns {import("@tanstack/react-query").UseMutationResult<Photo, unknown, Blob>} [return.uploadPhoto] - Mutation to upload a new profile photo.
+ * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, Photo>} [return.setMainPhoto] - Mutation to set a given photo as the main profile photo.
+ * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, string>} [return.deletePhoto] - Mutation to delete a profile photo by ID.
+ * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, EditProfileSchema>} [return.updateProfile] - Mutation to update the profile's display name and bio.
+ *
+ * @example
+ * const { profile, updateProfile } = useProfile('user-id');
+ * updateProfile.mutate({ displayName: 'New Name', bio: 'New bio' });
  *
  * @example
  * const { profile, uploadPhoto } = useProfile('user-id');
@@ -131,6 +136,29 @@ export const useProfile = (id?: string) => {
         }
     });    
 
+    const updateProfile = useMutation({
+        mutationFn: async (profile: EditProfileSchema) => {
+            await agent.put(`/profiles`, profile);
+        },
+        onSuccess: (_, profile) => {
+            queryClient.setQueryData(['profile', id], (data: Profile) => {
+                if (!data) return data;
+                return {
+                    ...data,
+                    displayName: profile.displayName,
+                    bio: profile.bio
+                }
+            });
+            queryClient.setQueryData(['user'], (userData: User) => {
+                if (!userData) return userData;
+                return {
+                    ...userData,
+                    displayName: profile.displayName
+                }
+            });
+        }
+    })    
+
     const deletePhoto = useMutation({
         mutationFn: async (photoId: string) => {
             await agent.delete(`/profiles/${photoId}/photos`);
@@ -153,6 +181,7 @@ export const useProfile = (id?: string) => {
         loadingPhotos,
         isCurrentUser,
         uploadPhoto,
+        updateProfile,
         setMainPhoto,
         deletePhoto
     }
