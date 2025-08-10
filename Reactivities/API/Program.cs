@@ -1,4 +1,5 @@
 using API.Middleware;
+using API.SignalR;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
@@ -35,6 +36,9 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 
 // Enable CORS (cross-origin resource sharing)
 builder.Services.AddCors();
+
+// Enable SignalR
+builder.Services.AddSignalR();
 
 // Add MediatR with pipeline behaviors
 builder.Services.AddMediatR(x =>
@@ -108,6 +112,9 @@ app.MapControllers();
 
 // Map Identity API endpoints under the "api" route
 app.MapGroup("api").MapIdentityApi<User>();
+
+// Map Hub API endpoints under the "comments" route
+app.MapHub<CommentHub>("/comments");
 
 #endregion
 

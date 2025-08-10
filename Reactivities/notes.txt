@@ -80,7 +80,7 @@ Some dotnet commands:
 - We defined our GetActivityList.cs in our Application folder, which handles the logic of retrieving the data.
 - Then, we used that logic inside ActivitiesController.cs to actually retrieve the data from our API.
 - Subsequently, we added our handler (GetActivityList class) as a service to our Program.cs
-- Same principle applies for GetActivityDetails class..
+- Same principle applies for GetActivityDetails class.
 
 35. Adding AutoMapper to the project
 - We installed the AutoMapper with NuGet in order to map changes made from the request to the activity from the database.
@@ -184,3 +184,37 @@ Add CloudinarySettings as a service inside Program.cs.
 182. Adding React Cropper
 - Install: npm install react-cropper.
 - This will help with resizing images during an upload.
+
+190. Setting up the comment entity
+- We added Comment as a Dbset inside our AppDbContext.cs.
+- Therefore we need to use the following command:
+    - dotnet ef migrations add CommentEntityAdded -p Persistence -s API
+
+-- DTOs
+- Domain models (Domain.Activity, User, etc.) represent your database entities and business rules.
+- DTOs (ActivityDto, CreateActivityDto, EditActivityDto, etc.) represent what your API actually sends and receives.
+
+---- Diagram
+[Database]
+   │
+   ▼
+[EF Core]
+   │  (loads domain entities from DB)
+   ▼
+[Domain Model]  ←── Business logic / Persistence rules
+   │
+   │ AutoMapper (MappingProfiles.cs)
+   ▼
+[DTO]  ←── The safe, shaped version for the API
+   │
+   ▼
+[Controller]  ←── Sends/receives DTOs
+   │
+   ▼
+[API Response]  ←── JSON to frontend
+   │
+   ▼
+[Frontend]  ←── React, consuming the shaped data
+
+195. Client SignalR setup
+- Install: npm install @microsoft/signalr

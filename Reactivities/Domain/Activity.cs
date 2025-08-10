@@ -63,4 +63,9 @@ public class Activity
     /// Navigation property for the related <see cref="Attendees"/>.
     /// </summary>
     public ICollection<ActivityAttendee> Attendees { get; set; } = [];
+
+    /// <summary>
+    /// Navigation property for the related <see cref="Comments"/>.
+    /// </summary>
+    public ICollection<Comment> Comments { get; set; } = [];
 }
