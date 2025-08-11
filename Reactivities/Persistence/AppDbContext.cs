@@ -36,6 +36,11 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(op
     public required DbSet<Comment> Comments { get; set; }
 
     /// <summary>
+    /// Gets or sets the collection of user followings.
+    /// </summary>
+    public required DbSet<UserFollowing> UserFollowings { get; set; }
+
+    /// <summary>
     /// Configures the entity relationships and keys using Fluent API.
     /// </summary>
     /// <param name="builder">The model builder used to configure the EF model.</param>
@@ -57,6 +62,22 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(op
             .HasOne(x => x.Activity)
             .WithMany(x => x.Attendees)
             .HasForeignKey(x => x.ActivityId);
+
+        // Configure relationship between 2 users (many-to-many)
+        builder.Entity<UserFollowing>(x =>
+        {
+            x.HasKey(k => new { k.ObserverId, k.TargetId });
+
+            x.HasOne(o => o.Observer)
+                .WithMany(f => f.Followings)
+                .HasForeignKey(o => o.ObserverId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            x.HasOne(o => o.Target)
+                .WithMany(f => f.Followers)
+                .HasForeignKey(o => o.TargetId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
         // Convert DateTime properties to DateTime Utc
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(

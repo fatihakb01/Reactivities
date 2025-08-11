@@ -1,5 +1,6 @@
 using System;
 using Application.Activities.DTO;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain;
@@ -24,7 +25,7 @@ public class GetActivityList
     /// Handler for processing the GetActivityList query.
     /// </summary>
     /// <param name="context">The application's database context.</param>
-    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, List<ActivityDto>>
+    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) : IRequestHandler<Query, List<ActivityDto>>
     {
         /// <summary>
         /// Handles the query and retrieves all activities from the database.
@@ -35,7 +36,8 @@ public class GetActivityList
         public async Task<List<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
         {
             return await context.Activities
-                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
+                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider,
+                    new { currentUserId = userAccessor.GetUserId() })
                 .ToListAsync(cancellationToken);
         }
     }

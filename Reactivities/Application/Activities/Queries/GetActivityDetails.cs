@@ -1,6 +1,7 @@
 using System;
 using Application.Activities.DTO;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -29,7 +30,7 @@ public class GetActivityDetails
     /// Handler for processing the GetActivityDetails query.
     /// </summary>
     /// <param name="context">The application's database context.</param>
-    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<ActivityDto>>
+    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) : IRequestHandler<Query, Result<ActivityDto>>
     {
         /// <summary>
         /// Handles the query and retrieves the specified activity.
@@ -40,7 +41,8 @@ public class GetActivityDetails
         public async Task<Result<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
         {
             var activity = await context.Activities
-                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
+                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider,
+                    new { currentUserId = userAccessor.GetUserId() })
                 .FirstOrDefaultAsync(x => request.Id == x.Id, cancellationToken);
 
             if (activity == null) return Result<ActivityDto>.Failure("Activity not found", 404);

@@ -11,8 +11,8 @@ type Props = {
  *
  * Features:
  * - Shows the user's image and display name.
- * - Optionally displays a "Following" chip.
- * - Displays follower count (currently hardcoded as 20).
+ * - Displays a "Following" chip.
+ * - Displays follower count.
  * - Card is wrapped in a link to the profile detail page.
  *
  * Props:
@@ -24,7 +24,6 @@ type Props = {
  * ```
  */
 export default function ProfileCard({profile}: Props) {
-    const following = false;
 
     return (
         <Link to={`/profiles/${profile.id}`} style={{textDecoration: 'none'}}>
@@ -32,7 +31,7 @@ export default function ProfileCard({profile}: Props) {
                 sx={{
                     borderRadius: 3, 
                     p: 3, 
-                    maxWidth: 300, 
+                    maxWidth: 250, 
                     textDecoration: 'none'
                 }}
                 elevation={4}
@@ -59,14 +58,14 @@ export default function ProfileCard({profile}: Props) {
                             </Typography>
                         )}
 
-                        {following && <Chip size="small" label='Following' 
+                        {profile.following && <Chip size="small" label='Following' 
                         color="secondary" variant="outlined"/>}
                     </Box>
                 </CardContent>
                 <Divider sx={{mb: 2}} />
                 <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'start'}}>
                     <Person />
-                    <Typography sx={{ml: 1}}>20 Followers</Typography>
+                    <Typography sx={{ml: 1}}>{profile.followersCount} Followers</Typography>
                 </Box>
             </Card>
         </Link>

@@ -4,36 +4,50 @@ import { useMemo } from "react";
 import type { EditProfileSchema } from "../schemas/editProfileSchema";
 
 /**
- * React hook for retrieving, updating, and managing a user's profile and their photos.
+ * Custom React hook for fetching and managing a user's profile, photos, followings, and related actions.
  *
- * Features:
- * - Fetches profile and photo data for a given user ID.
- * - Supports uploading, setting main, deleting profile photos, and updating profile details.
- * - Updates both the global user cache and profile cache on mutations.
- * - Detects if the given profile belongs to the current logged-in user.
+ * This hook integrates with `@tanstack/react-query` to provide:
+ * - Profile retrieval
+ * - Profile photo management (upload, set as main, delete)
+ * - Profile updates (display name, bio)
+ * - Following/unfollowing another user
+ * - Loading the list of followers or followings
  *
- * @param {string} [id] - The profile ID to fetch and operate on.
+ * @param {string} [id] - The ID of the user profile to fetch.
+ * @param {string} [predicate] - Optional filter for followings query:
+ *   - `"followers"`: Fetch users following the profile
+ *   - `"followings"`: Fetch users the profile is following
  *
- * @returns {Object} Hook result object.
- * @returns {Profile | undefined} [return.profile] - The profile data for the given ID.
- * @returns {boolean} [return.loadingProfile] - Whether the profile is currently loading.
- * @returns {Photo[] | undefined} [return.photos] - The list of profile photos for the user.
- * @returns {boolean} [return.loadingPhotos] - Whether the photos are currently loading.
- * @returns {boolean} [return.isCurrentUser] - Whether the profile belongs to the current logged-in user.
- * @returns {import("@tanstack/react-query").UseMutationResult<Photo, unknown, Blob>} [return.uploadPhoto] - Mutation to upload a new profile photo.
- * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, Photo>} [return.setMainPhoto] - Mutation to set a given photo as the main profile photo.
- * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, string>} [return.deletePhoto] - Mutation to delete a profile photo by ID.
- * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, EditProfileSchema>} [return.updateProfile] - Mutation to update the profile's display name and bio.
+ * @returns {Object} Hook result object
+ * @returns {Profile | undefined} return.profile - The loaded profile data.
+ * @returns {boolean} return.loadingProfile - Whether profile data is currently loading.
+ * @returns {Photo[] | undefined} return.photos - The list of profile photos.
+ * @returns {boolean} return.loadingPhotos - Whether photo data is currently loading.
+ * @returns {boolean} return.isCurrentUser - Whether the profile belongs to the logged-in user.
+ * @returns {import("@tanstack/react-query").UseMutationResult<Photo, unknown, Blob>} return.uploadPhoto - Mutation to upload a new photo.
+ * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, Photo>} return.setMainPhoto - Mutation to set a given photo as main.
+ * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, string>} return.deletePhoto - Mutation to delete a photo by ID.
+ * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, EditProfileSchema>} return.updateProfile - Mutation to update profile info.
+ * @returns {import("@tanstack/react-query").UseMutationResult<void>} return.updateFollowing - Mutation to follow/unfollow a user.
+ * @returns {Profile[] | undefined} return.followings - List of followers or followings based on `predicate`.
+ * @returns {boolean} return.loadingFollowings - Whether followings data is loading.
  *
  * @example
- * const { profile, updateProfile } = useProfile('user-id');
- * updateProfile.mutate({ displayName: 'New Name', bio: 'New bio' });
+ * // Fetch and update profile
+ * const { profile, updateProfile } = useProfile('user-123');
+ * updateProfile.mutate({ displayName: 'New Name', bio: 'Updated bio' });
  *
  * @example
- * const { profile, uploadPhoto } = useProfile('user-id');
+ * // Upload a photo
+ * const { uploadPhoto } = useProfile('user-123');
  * uploadPhoto.mutate(fileBlob);
+ *
+ * @example
+ * // Toggle following another user
+ * const { updateFollowing } = useProfile('other-user-id');
+ * updateFollowing.mutate();
  */
-export const useProfile = (id?: string) => {
+export const useProfile = (id?: string, predicate?: string) => {
     const queryClient = useQueryClient();
 
     const {data: profile, isLoading: loadingProfile} = useQuery<Profile>({
@@ -42,8 +56,8 @@ export const useProfile = (id?: string) => {
             const response = await agent.get<Profile>(`/profiles/${id}`);
             return response.data;
         },
-        enabled: !!id
-    })
+        enabled: !!id && !predicate
+    });
 
     const {data: photos, isLoading: loadingPhotos} = useQuery<Photo[]>({
         queryKey: ['photos', id],
@@ -51,8 +65,18 @@ export const useProfile = (id?: string) => {
             const response = await agent.get<Photo[]>(`/profiles/${id}/photos`);
             return response.data;
         },
-        enabled: !!id
-    })
+        enabled: !!id && !predicate
+    });
+
+    const {data: followings, isLoading: loadingFollowings} = useQuery<Profile[]>({
+        queryKey: ['followings', id, predicate],
+        queryFn: async () => {
+            const response = 
+                await agent.get<Profile[]>(`/profiles/${id}/follow-list?predicate=${predicate}`);
+            return response.data
+        },
+        enabled: !!id && !!predicate
+    });
 
     const uploadPhoto = useMutation({
         mutationFn: async (file: Blob) => {
@@ -82,7 +106,7 @@ export const useProfile = (id?: string) => {
                 }
             });
         }
-    })
+    });
 
     const setMainPhoto = useMutation({
         mutationFn: async (photo: Photo) => {
@@ -157,7 +181,7 @@ export const useProfile = (id?: string) => {
                 }
             });
         }
-    })    
+    });
 
     const deletePhoto = useMutation({
         mutationFn: async (photoId: string) => {
@@ -168,11 +192,30 @@ export const useProfile = (id?: string) => {
                 return photos?.filter(x => x.id !== photoId)
             })
         }
-    })
+    });
+
+    const updateFollowing = useMutation({
+        mutationFn: async () => {
+            await agent.post(`/profiles/${id}/follow`)
+        },
+        onSuccess: () => {
+            queryClient.setQueryData(['profile', id], (profile: Profile) => {
+                queryClient.invalidateQueries({queryKey: ['followings', id, 'followers']})
+                if (!profile || profile.followersCount === undefined) return profile;
+                return {
+                    ...profile,
+                    following: !profile.following,
+                    followersCount: profile.following 
+                        ? profile.followersCount - 1 
+                        : profile.followersCount + 1
+                }
+            })
+        }
+    });
 
     const isCurrentUser = useMemo(() => {
         return id === queryClient.getQueryData<User>(['user'])?.id
-    }, [id, queryClient])
+    }, [id, queryClient]);
 
     return {
         profile,
@@ -183,6 +226,9 @@ export const useProfile = (id?: string) => {
         uploadPhoto,
         updateProfile,
         setMainPhoto,
-        deletePhoto
+        deletePhoto,
+        updateFollowing,
+        followings,
+        loadingFollowings
     }
 }

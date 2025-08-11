@@ -218,3 +218,10 @@ Add CloudinarySettings as a service inside Program.cs.
 
 195. Client SignalR setup
 - Install: npm install @microsoft/signalr
+
+202. Adding the join entity
+- We configured a relationship between 2 users in our AppDbContext.cs.
+- That's why we did another migration using the following command: 
+   - dotnet ef migrations add FollowerEntityAdded -p Persistence -s API
+- If you want a SQL script of your migrations, then use:
+   - dotnet ef migrations script -o test.sql -p Persistence -s API
