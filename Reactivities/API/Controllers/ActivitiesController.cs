@@ -2,6 +2,7 @@ using System;
 using Application.Activities.Commands;
 using Application.Activities.DTO;
 using Application.Activities.Queries;
+using Application.Core;
 using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -17,13 +18,23 @@ namespace API.Controllers;
 public class ActivitiesController : BaseApiController
 {
     /// <summary>
-    /// Retrieves a list of all activities from the system.
+    /// Retrieves a paginated list of activities based on provided query parameters.
     /// </summary>
-    /// <returns>A list of <see cref="Activity"/> objects.</returns>
+    /// <param name="activityParams">
+    /// The query parameters used for filtering, sorting, and pagination, 
+    /// including filter type, start date, cursor position, and page size.
+    /// </param>
+    /// <returns>
+    /// A paged list of <see cref="ActivityDto"/> objects along with an optional next cursor for pagination.
+    /// </returns>
+    /// <remarks>
+    /// This endpoint supports infinite scrolling style pagination using a cursor.
+    /// </remarks>
     [HttpGet]
-    public async Task<ActionResult<List<ActivityDto>>> GetActivities()
+    public async Task<ActionResult<PagedList<ActivityDto, DateTime?>>> GetActivities(
+        [FromQuery] ActivityParams activityParams)
     {
-        return await Mediator.Send(new GetActivityList.Query());
+        return HandleResult(await Mediator.Send(new GetActivityList.Query {Params = activityParams}));
     }
 
     /// <summary>

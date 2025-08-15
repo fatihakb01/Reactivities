@@ -1,13 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../api/agent";
 import { useLocation } from "react-router";
 import { useAccount } from "./useAccount";
+import { useStore } from "./useStore";
 
 /**
  * React hook for managing activity data using React Query and a REST API.
  *
  * Features:
- * - Fetches either a list of activities or a single activity based on an optional ID
+ * - Fetches a paginated list of activities or a single activity based on an optional ID
+ * - Supports cursor-based pagination with `NextCursor` for infinite scrolling
+ * - Filters activities (e.g., all, "isGoing", "isHost")
  * - Performs create, update, and delete operations
  * - Optimistically updates attendance with rollback support on error
  * - Enriches activities with user-related flags (`isHost`, `isGoing`)
@@ -15,20 +18,21 @@ import { useAccount } from "./useAccount";
  *
  * @param {string} [id] - Optional activity ID. If provided, fetches a single activity.
  *
- * @returns {{
- *   activities: Activity[] | undefined;
- *   activity: Activity | undefined;
- *   isLoading: boolean;
- *   isLoadingActivity: boolean;
- *   createActivity: UseMutationResult<unknown, unknown, Activity, unknown>;
- *   updateActivity: UseMutationResult<void, unknown, Activity, unknown>;
- *   deleteActivity: UseMutationResult<void, unknown, string, unknown>;
- *   updateAttendance: UseMutationResult<void, unknown, string, { prevActivity?: Activity }>;
- * }}
+ * @returns {Object} Hook result object
+ * @returns {Activity[] | undefined} return.activities - The loaded list of activities.
+ * @returns {Activity | undefined} return.activity - The currently selected activity (if `id` is provided).
+ * @returns {boolean} return.isLoading - Whether the activity list is currently loading.
+ * @returns {boolean} return.isLoadingActivity - Whether the single activity is currently loading.
+ * @returns {import("@tanstack/react-query").UseMutationResult<unknown, unknown, Activity>} return.createActivity - Mutation to create a new activity.
+ * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, Activity>} return.updateActivity - Mutation to update an existing activity.
+ * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, string>} return.deleteActivity - Mutation to delete an activity by ID.
+ * @returns {import("@tanstack/react-query").UseMutationResult<void, unknown, string, { prevActivity?: Activity }>} return.updateAttendance - Mutation to toggle attendance.
+ * @returns {Function} return.fetchNextPage - Function to load the next page of activities.
+ * @returns {boolean} return.hasNextPage - Whether more pages are available for loading.
  *
  * @example
- * // Fetch a list of activities:
- * const { activities, isLoading } = useActivities();
+ * // Fetch activities with infinite scroll:
+ * const { activities, fetchNextPage, hasNextPage } = useActivities();
  *
  * // Fetch a single activity by ID:
  * const { activity, isLoadingActivity } = useActivities('123');
@@ -40,28 +44,45 @@ import { useAccount } from "./useAccount";
  * updateAttendance.mutate('activity-id');
  */
 export const useActivities = (id?: string) => {
+    const {activityStore: {filter, startDate}} = useStore();
     const queryClient = useQueryClient();
     const {currentUser} = useAccount();
     const location = useLocation();
 
-    const {data: activities, isLoading} = useQuery({
-        queryKey: ['activities'],
-        queryFn: async () => {
-        const response = await agent.get<Activity[]>('/activities');
-        return response.data;
-        },
-        enabled: !id && location.pathname === '/activities' && !!currentUser,
-        select: data => {
-            return data.map(activity => {
-                const host = activity.attendees.find(x => x.id === activity.hostId);
-                return {
-                    ...activity,
-                    isHost: currentUser?.id === activity.hostId,
-                    isGoing: activity.attendees.some(x => x.id === currentUser?.id),
-                    hostImageUrl: host?.imageUrl
+    const {data: activitiesGroup, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage} 
+        = useInfiniteQuery<PagedList<Activity, string>>({
+        queryKey: ['activities', filter, startDate],
+        queryFn: async ({pageParam = null}) => {
+            const response = await agent.get<PagedList<Activity, string>>('/activities', {
+                params: {
+                    cursor: pageParam,
+                    pageSize: 3,
+                    filter,
+                    startDate
                 }
-            })
-        }
+            });
+            return response.data;
+        },
+        staleTime: 1000 * 60 * 5,
+        placeholderData: keepPreviousData,
+        initialPageParam: null,
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+        enabled: !id && location.pathname === '/activities' && !!currentUser,
+        select: data => ({
+            ...data,
+            pages: data.pages.map((page) => ({
+                ...page,
+                items: page.items.map(activity => {
+                    const host = activity.attendees.find(x => x.id === activity.hostId);
+                    return {
+                        ...activity,
+                        isHost: currentUser?.id === activity.hostId,
+                        isGoing: activity.attendees.some(x => x.id === currentUser?.id),
+                        hostImageUrl: host?.imageUrl
+                    }
+                })
+            }))
+        })
     });
 
     const {data: activity, isLoading: isLoadingActivity} = useQuery({
@@ -160,7 +181,10 @@ export const useActivities = (id?: string) => {
     })
 
     return {
-        activities,
+        activitiesGroup,
+        isFetchingNextPage, 
+        fetchNextPage, 
+        hasNextPage,
         isLoading,
         updateActivity,
         createActivity,

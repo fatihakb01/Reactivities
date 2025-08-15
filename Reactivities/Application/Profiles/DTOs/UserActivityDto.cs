@@ -1,0 +1,14 @@
+using System;
+
+namespace Application.Profiles.DTOs;
+
+/// <summary>
+/// Data transfer object representing a user activity.
+/// </summary>
+public class UserActivityDto
+{
+    public required string Id { get; set; }
+    public required string Title { get; set; }
+    public required string Category { get; set; }
+    public DateTime Date { get; set; }
+}

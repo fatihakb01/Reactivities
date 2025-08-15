@@ -225,3 +225,13 @@ Add CloudinarySettings as a service inside Program.cs.
    - dotnet ef migrations add FollowerEntityAdded -p Persistence -s API
 - If you want a SQL script of your migrations, then use:
    - dotnet ef migrations script -o test.sql -p Persistence -s API
+
+212. Setting up cursor pagination
+- We need another migration because we created an additional index on the Date property of the Activity Domain Model.
+- We do this to make our cursor more efficient with cursor pagination
+- Use the following command
+   - dotnet ef migrations add DateIndexAdded -p Persistence -s API
+
+216. Adding infinite scrolling
+- We need to use a package to make infinite scrolling possible
+   - npm install react-intersection-observer
