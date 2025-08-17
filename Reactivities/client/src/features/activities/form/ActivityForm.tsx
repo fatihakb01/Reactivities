@@ -61,7 +61,6 @@ export default function ActivityForm() {
    * @param data The validated activity form data
    */
   const onSubmit = async (data: ActivitySchema) => {
-    console.log(data);
     const {location, ...rest} = data;
     const flattenedData = {...rest, ...location};
     try {
@@ -113,7 +112,7 @@ export default function ActivityForm() {
             <LocationInput control={control} label='Enter the location' name="location"></LocationInput>
             
             <Box display='flex' justifyContent='end' gap={3}>
-                <Button color='inherit'>Cancel</Button>
+                <Button onClick={() => (navigate(-1))} color='inherit'>Cancel</Button>
                 <Button 
                   type="submit" 
                   color='success' 

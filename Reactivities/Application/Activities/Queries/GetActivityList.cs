@@ -16,8 +16,6 @@ namespace Application.Activities.Queries;
 /// </summary>
 public class GetActivityList
 {
-    private const int MaxPageSize = 50;
-
     /// <summary>
     /// Represents the query to retrieve a paginated list of activities.
     /// </summary>

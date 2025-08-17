@@ -235,3 +235,27 @@ Add CloudinarySettings as a service inside Program.cs.
 216. Adding infinite scrolling
 - We need to use a package to make infinite scrolling possible
    - npm install react-intersection-observer
+
+224. Preparing the client app for publishing
+- Run the production client app with the following command:
+   - npm run build
+
+226. Creating a Sql Server DB
+- We are using Docker for setting up Sql DB
+- We configured docker using docker-compose.yml
+- This will run the Docker service:
+   - docker compose up -d
+
+227. Connecting to the Sql Server
+- Use '127.0.0.1,1433' as the username
+- '127.0.0.1' refers to localhost and '1433' is the port specified in the docker-compose.yml
+
+Some additonal notes 
+- .Any → checks if at least one item in a collection meets a condition.
+- !! → forces truthy/falsy values into a strict boolean (true/false) ==> similar purpose as '==='.
+- [FromQuery] → binds URL query parameters into your method parameter object.
+[FromQuery] tells ASP.NET Core: “bind this parameter from the query string in the URL.”
+
+231. Deploying the app to Azure
+- Use the following command to make the .NET project ready for publishing
+   - dotnet publish -c Release -o ./bin/Publish

@@ -72,7 +72,7 @@ export default function ActivityDetailsHeader({activity}: Props) {
                 <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{activity.title}</Typography>
                 <Typography variant="subtitle1">{formatDate(activity.date)}</Typography>
                 <Typography variant="subtitle2">
-                    Hosted by 
+                    Hosted by {' '}
                     <Link 
                         to={`/profiles/${activity.hostId}`} 
                         style={{ color: 'white', fontWeight: 'bold' }}>

@@ -39,7 +39,9 @@ export default function ProfileFollowings({activeTab}: Props) {
                 </Typography>
             </Box>
             <Divider sx={{my: 2}}/>
-            {loadingFollowings ? <Typography>Loading...</Typography> : (
+            {loadingFollowings ? 
+            <Typography>Loading...</Typography> 
+            : (
                 <Box display='flex' marginTop={3} gap={3}>
                     {followings?.map(profile => (
                         <ProfileCard key={profile.id} profile={profile} />

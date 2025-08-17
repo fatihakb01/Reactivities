@@ -54,7 +54,7 @@ export const activitySchema = z.object({
         city: requiredString('City'),
         latitude: z.coerce.number<number>(),
         longitude: z.coerce.number<number>()
-    }),
+    })
 })
 
 /** 

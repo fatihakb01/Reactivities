@@ -31,7 +31,7 @@ builder.Services.AddControllers(opt =>
 // Configure the database context using SQLite and the connection string from configuration
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 // Enable CORS (cross-origin resource sharing)
@@ -107,6 +107,10 @@ app.UseCors(x => x
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Use default & static files (necessary for production)
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 // Map controller endpoints
 app.MapControllers();
 
@@ -115,6 +119,9 @@ app.MapGroup("api").MapIdentityApi<User>();
 
 // Map Hub API endpoints under the "comments" route
 app.MapHub<CommentHub>("/comments");
+
+// Map to FallbackController
+app.MapFallbackToController("Index", "Fallback");
 
 #endregion
 
