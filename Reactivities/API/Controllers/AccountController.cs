@@ -1,9 +1,12 @@
 using System;
+using System.Text;
 using API.DTOs;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
@@ -11,7 +14,8 @@ namespace API.Controllers;
 /// Controller responsible for user account-related actions such as registration,
 /// retrieving user info, and logging out.
 /// </summary>
-public class AccountController(SignInManager<User> signInManager) : BaseApiController
+public class AccountController(SignInManager<User> signInManager,
+    IEmailSender<User> emailSender, IConfiguration config) : BaseApiController
 {
 
     /// <summary>
@@ -35,14 +39,70 @@ public class AccountController(SignInManager<User> signInManager) : BaseApiContr
 
         var result = await signInManager.UserManager.CreateAsync(user, registerDTO.Password);
 
-        if (result.Succeeded) return Ok();
-
-        foreach (var error in result.Errors)
+        if (result.Succeeded)
         {
-            ModelState.AddModelError(error.Code, error.Description);
+            await SendConfirmationEmailAsync(user, registerDTO.Email);
+
+            return Ok();
         }
 
+        foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.Code, error.Description);
+            }
+
         return ValidationProblem();
+    }
+
+    [AllowAnonymous]
+    [HttpGet("confirmEmail")]
+    public async Task<ActionResult> ConfirmEmail(string userId, string code)
+    {
+        var user = await signInManager.UserManager.FindByIdAsync(userId);
+        if (user == null) return BadRequest("Invalid user ID");
+
+        var decodedCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+
+        // This is the method that sets EmailConfirmed = 1 internally
+        var result = await signInManager.UserManager.ConfirmEmailAsync(user, decodedCode);
+
+        if (!result.Succeeded)
+            return BadRequest("Email confirmation failed");
+
+        return Ok("Email confirmed successfully");
+    }
+
+
+    [AllowAnonymous]
+    [HttpGet("resendConfirmEmail")]
+    public async Task<ActionResult> ResendConfirmEmail(string? email, string? userId)
+    {
+        if (string.IsNullOrEmpty(email) && string.IsNullOrEmpty(userId))
+        {
+            return BadRequest("Email or UserId must be provided");
+        }
+
+        var user = await signInManager.UserManager.Users
+            .FirstOrDefaultAsync(x => x.Email == email || x.Id == userId);
+
+        if (user == null || string.IsNullOrEmpty(user.Email))
+        {
+            return BadRequest("User not found");
+        }
+
+        await SendConfirmationEmailAsync(user, user.Email);
+
+        return Ok();
+    }
+
+    private async Task SendConfirmationEmailAsync(User user, string email)
+    {
+        var code = await signInManager.UserManager.GenerateEmailConfirmationTokenAsync(user);
+        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+        var confirmEmailUrl = $"{config["ClientAppUrl"]}/confirmEmail?userId={user.Id}&code={code}";
+
+        await emailSender.SendConfirmationLinkAsync(user, email, confirmEmailUrl);
     }
 
     /// <summary>
