@@ -259,3 +259,8 @@ Some additonal notes
 231. Deploying the app to Azure
 - Use the following command to make the .NET project ready for publishing
    - dotnet publish -c Release -o ./bin/Publish
+
+237. Creating a resend account
+- We will first create our new feature on a different branch:
+    - git checkout -b EmailConfirmation
+
