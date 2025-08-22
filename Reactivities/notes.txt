@@ -261,6 +261,9 @@ Some additonal notes
    - dotnet publish -c Release -o ./bin/Publish
 
 237. Creating a resend account
-- We will first create our new feature on a different branch:
+- We will create our new feature on a different branch:
     - git checkout -b EmailConfirmation
 
+248. Creating a password change function for logged in users
+- We will create our new feature on a different branch:
+    - git checkout -b PasswordReset

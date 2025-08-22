@@ -4,6 +4,7 @@ import agent from "../api/agent"
 import { useNavigate } from "react-router";
 import type { RegisterSchema } from "../schemas/registerSchema";
 import { toast } from "react-toastify";
+import type { ChangePasswordSchema } from "../schemas/changePasswordSchema";
 
 /**
  * React hook for managing user account actions and authentication state.
@@ -40,7 +41,6 @@ export const useAccount = () => {
     const loginUser = useMutation({
         mutationFn: async (creds: LoginSchema) => {
             await agent.post('/login?useCookies=true', creds);
-            console.log(creds);
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({
@@ -95,6 +95,24 @@ export const useAccount = () => {
         enabled: !queryClient.getQueryData(['user']) 
     });
 
+    const changePassword = useMutation({
+        mutationFn: async (data: ChangePasswordSchema) => {
+            await agent.post('/account/change-password', data)
+        }
+    })
+
+    const forgotPassword = useMutation({
+        mutationFn: async (email: string) => {
+            await agent.post('/forgotPassword', {email})
+        }
+    })
+
+    const resetPassword = useMutation({
+        mutationFn: async (data: ResetPassword) => {
+            await agent.post('/resetPassword', data)
+        }
+    })
+
     return {
         loginUser,
         currentUser,
@@ -102,6 +120,9 @@ export const useAccount = () => {
         loadingUserInfo,
         registerUser,
         verifyEmail,
-        resendConfirmationEmail
+        resendConfirmationEmail,
+        changePassword,
+        forgotPassword,
+        resetPassword
     }
 }
