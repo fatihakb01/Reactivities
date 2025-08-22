@@ -39,5 +39,5 @@ export function timeAgo(date: DateArg<Date>) {
  * });
  */
 export const requiredString = (fieldName: string) => z
-    .string()
+    .string('')
     .min(1, {message: `${fieldName} is required`})
