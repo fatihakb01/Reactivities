@@ -7,30 +7,30 @@ import { toast } from "react-toastify";
 import type { ChangePasswordSchema } from "../schemas/changePasswordSchema";
 
 /**
- * React hook for managing user account actions and authentication state.
- * Wraps API calls with React Query for caching and mutations.
+ * A custom React hook for managing user account-related actions and authentication state.
+ *
+ * This hook centralizes all API calls related to user accounts (e.g., login, register,
+ * password management) and wraps them with `react-query` mutations for efficient
+ * state management, caching, and background synchronization.
  *
  * Features:
- * - `loginUser`: mutation to log a user in
- * - `registerUser`: mutation to create a new user account
- * - `logoutUser`: mutation to log the user out
- * - `currentUser`: the currently logged‑in user (or undefined if none)
- * - `loadingUserInfo`: boolean flag while checking the user’s session
- *
- * On successful login or registration:
- * - Queries are invalidated to refresh data
- * - Navigation redirects (e.g., to `/activities` or `/login`)
- *
- * On logout:
- * - Clears cached user and activity data
- * - Redirects to `/`
+ * - `loginUser`: A mutation for user login.
+ * - `registerUser`: A mutation for new user registration.
+ * - `logoutUser`: A mutation to log the current user out.
+ * - `verifyEmail`: A mutation to confirm a user's email address.
+ * - `resendConfirmationEmail`: A mutation to resend the email verification link.
+ * - `changePassword`: A mutation to change a user's password.
+ * - `forgotPassword`: A mutation to request a password reset link.
+ * - `resetPassword`: A mutation to set a new password using a reset code.
+ * - `currentUser`: A query that fetches the currently authenticated user's information.
+ * - `loadingUserInfo`: A boolean flag indicating if the user data is currently being fetched.
  *
  * Example usage:
  * ```tsx
  * const { currentUser, loginUser, logoutUser } = useAccount();
- * 
+ *
  * if (currentUser) {
- *   logoutUser.mutate();
+ * logoutUser.mutate();
  * }
  * ```
  */

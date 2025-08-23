@@ -10,18 +10,7 @@ namespace Application.Core;
 /// <param name="details">Optional stack trace or extended error details.</param>
 public class AppException(int statusCode, string message, string? details)
 {
-    /// <summary>
-    /// Gets or sets the HTTP status code of the exception.
-    /// </summary>
     public int StatusCode { get; set; } = statusCode;
-
-    /// <summary>
-    /// Gets or sets the human-readable error message.
-    /// </summary>
     public string Message { get; set; } = message;
-
-    /// <summary>
-    /// Gets or sets detailed error information (e.g., stack trace).
-    /// </summary>
     public string? Details { get; set; } = details;
 }

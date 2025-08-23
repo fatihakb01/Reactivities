@@ -6,6 +6,24 @@ type Props = {
     email?: string;
 }
 
+/**
+ * A component to display after a successful user registration.
+ *
+ * Features:
+ * - Displays a success message and a call to action to check email.
+ * - Provides a button to resend the confirmation email.
+ * - Calls the `useAccount().resendConfirmationEmail` mutation on button click.
+ * - Uses Material UI for styling and layout.
+ *
+ * Props:
+ * @property {Object} RegisterSuccessProps
+ * @property {string} [email] - The email address of the newly registered user.
+ *
+ * Example usage:
+ * ```tsx
+ * <RegisterSuccess email={user.email} />
+ * ```
+ */
 export default function RegisterSuccess({email}: Props) {
     const {resendConfirmationEmail} = useAccount();
 

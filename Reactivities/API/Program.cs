@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using API.Middleware;
 using API.SignalR;
 using Application.Activities.Queries;
@@ -12,6 +13,7 @@ using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Resend;
@@ -22,6 +24,18 @@ using Resend;
 var builder = WebApplication.CreateBuilder(args);
 
 #region Configure Services
+
+// Rate limiter
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("fixed", opt =>
+    {
+        opt.PermitLimit = 4;
+        opt.Window = TimeSpan.FromSeconds(12);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 2;
+    });
+});
 
 // Add controllers with a global authorization policy (require authenticated user by default)
 builder.Services.AddControllers(opt =>

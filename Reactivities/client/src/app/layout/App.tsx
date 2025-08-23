@@ -3,7 +3,12 @@ import NavBar from "./NavBar";
 import { Outlet, ScrollRestoration, useLocation } from "react-router";
 import HomePage from "../../features/home/HomePage";
 
-// The Outlet component will find the route and the corresponding component 
+/**
+ * The main component that serves as the root of the application.
+ * It conditionally renders the home page or the main layout (NavBar + content)
+ * based on the current route.
+ * @returns {JSX.Element} The App component.
+ */
 function App() {
   const location = useLocation();
 

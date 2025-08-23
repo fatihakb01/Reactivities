@@ -223,6 +223,9 @@ csx/
 ecf/
 rcf/
 
+# Exclude notes
+notes.txt
+
 # Windows Store app package directories and files
 AppPackages/
 BundleArtifacts/

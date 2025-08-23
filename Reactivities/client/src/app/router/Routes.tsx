@@ -4,8 +4,8 @@ import HomePage from "../../features/home/HomePage";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
 import ActivityForm from "../../features/activities/form/ActivityForm";
 import ActivityDetailPage from "../../features/activities/details/ActivityDetailPage";
-import Counter from "../../features/counter/Counter";
-import TestErrors from "../../features/errors/TestError";
+// import Counter from "../../features/counter/Counter";
+// import TestErrors from "../../features/errors/TestError";
 import NotFound from "../../features/errors/NotFound";
 import ServerError from "../../features/errors/ServerError";
 import LoginForm from "../../features/account/LoginForm";
@@ -17,7 +17,12 @@ import ChangePasswordForm from "../../features/account/ChangePasswordForm";
 import ForgotPasswordForm from "../../features/account/ForgotPasswordForm";
 import ResetPasswordForm from "../../features/account/ResetPasswordForm";
 
-// Define the different routes
+/**
+ * Defines the main router for the application.
+ * It uses a nested route structure with a top-level `App` component.
+ * Protected routes are wrapped by the `RequireAuth` element.
+ * @type {import("react-router").BrowserRouter}
+ */
 export const router = createBrowserRouter([
     {
         path: '/',
@@ -32,8 +37,8 @@ export const router = createBrowserRouter([
                 {path: 'change-password', element: <ChangePasswordForm />}
             ]},
             {path: '', element: <HomePage />},
-            {path: 'counter', element: <Counter />},
-            {path: 'errors', element: <TestErrors />},
+            // {path: 'counter', element: <Counter />},
+            // {path: 'errors', element: <TestErrors />},
             {path: 'not-found', element: <NotFound />},
             {path: 'server-error', element: <ServerError />},
             {path: 'login', element: <LoginForm />},

@@ -9,21 +9,9 @@ namespace Application.Core;
 /// <typeparam name="T">The type of the value returned in case of success.</typeparam>
 public class Result<T>
 {
-    /// <summary>
-    /// Indicates whether the operation was successful.
-    /// </summary>
     public bool IsSuccess { get; set; }
-    /// <summary>
-    /// The value returned from the operation if successful.
-    /// </summary>
     public T? Value { get; set; }
-    /// <summary>
-    /// The error message if the operation failed.
-    /// </summary>
     public string? Error { get; set; }
-    /// <summary>
-    /// A status code indicating the type of failure (e.g., 404 Not Found).
-    /// </summary>
     public int Code { get; set; }
 
     /// <summary>

@@ -32,7 +32,6 @@ public class UpdateAttendance
     public class Handler(IUserAccessor userAccessor, AppDbContext context)
     : IRequestHandler<Command, Result<Unit>>
     {
-        /// <inheritdoc />
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
             var activity = await context.Activities

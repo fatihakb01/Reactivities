@@ -6,6 +6,25 @@ import TextInput from '../../app/shared/components/TextInput';
 import { useAccount } from '../../lib/hooks/useAccount';
 import { toast } from 'react-toastify';
 
+/**
+ * The form for changing a user's password.
+ *
+ * Features:
+ * - Uses `AccountFormWrapper` for consistent layout and form handling.
+ * - Uses Zod (`changePasswordSchema`) for validation via `zodResolver`.
+ * - Calls the `useAccount().changePassword` mutation on submit.
+ * - Displays a success toast notification on successful password change.
+ *
+ * Form Fields:
+ * - Current password
+ * - New password
+ * - Confirm new password
+ *
+ * Example usage:
+ * ```tsx
+ * <ChangePasswordForm />
+ * ```
+ */
 export default function ChangePasswordForm() {
     const {changePassword} = useAccount()
     const onSubmit = async (data: ChangePasswordSchema) => {

@@ -2,7 +2,24 @@ import { Group } from "@mui/icons-material";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { Link } from "react-router";
 
-// Display the home page
+/**
+ * The main home page component for the application.
+ *
+ * This component serves as the landing page, providing a visually appealing
+ * welcome message and a clear call to action to start using the app.
+ *
+ * Features:
+ * - Displays the application title and a welcoming message.
+ * - Uses a prominent gradient background and an icon for visual appeal.
+ * - Provides a large button to navigate to the activities dashboard.
+ * - Uses Material UI for all styling and layout.
+ *
+ * Example usage:
+ * ```tsx
+ * // Renders at the root path '/'
+ * <HomePage />
+ * ```
+ */
 export default function HomePage() {
   return (
     <Paper

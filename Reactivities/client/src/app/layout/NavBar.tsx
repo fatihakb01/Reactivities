@@ -6,8 +6,13 @@ import { Observer } from "mobx-react-lite";
 import { useAccount } from "../../lib/hooks/useAccount";
 import UserMenu from "./UserMenu";
 
-// use rfc to create a React component
-// use the sx to specify custom css
+/**
+ * A responsive navigation bar for the application.
+ * It displays a main logo, navigation links, and a user menu
+ * that changes based on the user's authentication status.
+ * It also shows a loading spinner when the UI is in a loading state.
+ * @returns {JSX.Element} The NavBar component.
+ */
 export default function NavBar() {
   const {uiStore} = useStore();
   const {currentUser} = useAccount();
@@ -47,12 +52,12 @@ export default function NavBar() {
                     <MenuItemLink to='/activities'>
                             Activities
                     </MenuItemLink>
-                    <MenuItemLink to='/counter'>
+                    {/* <MenuItemLink to='/counter'>
                             Counter
                     </MenuItemLink>
                     <MenuItemLink to='/errors'>
                             Errors
-                    </MenuItemLink>
+                    </MenuItemLink> */}
                 </Box>
                 <Box display='flex' alignItems='center'>
                   {currentUser ? (

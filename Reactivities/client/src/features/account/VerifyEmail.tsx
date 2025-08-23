@@ -4,6 +4,27 @@ import { useEffect, useRef, useState } from "react";
 import { Box, Button, Divider, Paper, Typography } from "@mui/material";
 import { EmailRounded } from "@mui/icons-material";
 
+/**
+ * A component for handling and displaying the email verification process.
+ *
+ * This component verifies a user's email address using parameters from the URL.
+ * It provides a dynamic UI that shows the verification status and offers
+ * options for success or failure.
+ *
+ * Features:
+ * - Reads `userId` and `code` from URL search parameters.
+ * - Uses `useEffect` and a `useRef` to prevent multiple verification calls.
+ * - Manages different states: `verifying`, `verified`, and `failed`.
+ * - Renders a specific message and action button based on the verification status.
+ * - Calls the `verifyEmail` mutation on initial load.
+ * - Offers a button to `resendConfirmationEmail` if verification fails.
+ *
+ * Example usage:
+ * ```tsx
+ * // Renders on a URL like /confirmEmail?userId=...&code=...
+ * <VerifyEmail />
+ * ```
+ */
 export default function VerifyEmail() {
     const {verifyEmail, resendConfirmationEmail} = useAccount();
     const [status, setStatus] = useState('verifying');

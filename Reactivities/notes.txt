@@ -267,3 +267,25 @@ Some additonal notes
 248. Creating a password change function for logged in users
 - We will create our new feature on a different branch:
     - git checkout -b PasswordReset
+
+Make sure that remote & local repository are equal:
+Step 1
+- Run this:
+   - git fetch origin
+   - git status
+- You should see something like:
+   - On branch main
+   - Your branch is up to date with 'origin/main'.
+- If you instead see something like:
+   - Your branch is behind 'origin/main' by X commits
+- then run:
+   - git pull origin main
+   - That will sync your local main with the remote origin/main.
+Step 2
+- git branch --merged main
+- This lists all local branches that are already fully merged into main.
+- Look for your new branch in that list (e.g. PasswordReset).
+- If you see it, then it means that all it's commits are in main.
+Step 3
+- Delete local branch: git branch -d PasswordReset
+- Delete remote branch: git push origin --delete PasswordReset

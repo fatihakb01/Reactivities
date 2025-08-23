@@ -54,6 +54,15 @@ public class AccountController(SignInManager<User> signInManager,
         return ValidationProblem();
     }
 
+    /// <summary>
+    /// Confirms a user's email address using a provided user ID and confirmation code.
+    /// </summary>
+    /// <param name="userId">The ID of the user to confirm.</param>
+    /// <param name="code">The base64 URL-encoded confirmation token.</param>
+    /// <returns>
+    /// Returns <see cref="OkObjectResult"/> if the email is confirmed successfully.
+    /// Returns <see cref="BadRequestResult"/> if the user ID is invalid or confirmation fails.
+    /// </returns>
     [AllowAnonymous]
     [HttpGet("confirmEmail")]
     public async Task<ActionResult> ConfirmEmail(string userId, string code)
@@ -72,7 +81,15 @@ public class AccountController(SignInManager<User> signInManager,
         return Ok("Email confirmed successfully");
     }
 
-
+    /// <summary>
+    /// Resends the email confirmation link to a user.
+    /// </summary>
+    /// <param name="email">The email of the user to resend the confirmation email to.</param>
+    /// <param name="userId">The ID of the user to resend the confirmation email to.</param>
+    /// <returns>
+    /// Returns <see cref="OkResult"/> on success.
+    /// Returns <see cref="BadRequestResult"/> if the user cannot be found or the input is invalid.
+    /// </returns>
     [AllowAnonymous]
     [HttpGet("resendConfirmEmail")]
     public async Task<ActionResult> ResendConfirmEmail(string? email, string? userId)
@@ -95,6 +112,11 @@ public class AccountController(SignInManager<User> signInManager,
         return Ok();
     }
 
+    /// <summary>
+    /// Helper method to generate and send an email confirmation link.
+    /// </summary>
+    /// <param name="user">The user to send the confirmation email for.</param>
+    /// <param name="email">The email address of the user.</param>
     private async Task SendConfirmationEmailAsync(User user, string email)
     {
         var code = await signInManager.UserManager.GenerateEmailConfirmationTokenAsync(user);
@@ -146,6 +168,15 @@ public class AccountController(SignInManager<User> signInManager,
         return NoContent();
     }
 
+    /// <summary>
+    /// Allows an authenticated user to change their password.
+    /// </summary>
+    /// <param name="passwordDto">The DTO containing the current password and the new password.</param>
+    /// <returns>
+    /// Returns <see cref="OkResult"/> if the password was changed successfully.
+    /// Returns <see cref="UnauthorizedResult"/> if the user is not authenticated.
+    /// Returns <see cref="BadRequestResult"/> if the current password is incorrect or the new password is invalid.
+    /// </returns>
     [HttpPost("change-password")]
     public async Task<ActionResult> ChangePassword(ChangePasswordDto passwordDto)
     {

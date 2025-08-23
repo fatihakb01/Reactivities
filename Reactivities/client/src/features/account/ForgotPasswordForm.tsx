@@ -6,6 +6,23 @@ import AccountFormWrapper from './AccountFormWrapper';
 import { LockOpen } from '@mui/icons-material';
 import TextInput from '../../app/shared/components/TextInput';
 
+/**
+ * The form for requesting a password reset email.
+ *
+ * Features:
+ * - Uses `AccountFormWrapper` for consistent layout and form handling.
+ * - Calls the `useAccount().forgotPassword` mutation on submit.
+ * - Navigates to the login page after a successful request.
+ * - Displays a success toast notification.
+ *
+ * Form Fields:
+ * - Email address
+ *
+ * Example usage:
+ * ```tsx
+ * <ForgotPasswordForm />
+ * ```
+ */
 export default function ForgotPasswordForm() {
     const {forgotPassword} = useAccount();
     const navigate = useNavigate();

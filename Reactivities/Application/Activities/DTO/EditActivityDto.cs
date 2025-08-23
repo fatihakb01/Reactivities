@@ -8,8 +8,5 @@ namespace Application.Activities.DTO;
 /// </summary>
 public class EditActivityDto : BaseActivityDto
 {
-    /// <summary>
-    /// The unique identifier of the activity to be edited.
-    /// </summary>
     public string Id { get; set; } = "";
 }

@@ -108,7 +108,12 @@ public class ProfilesController : BaseApiController
         return HandleResult(await Mediator.Send(new GetFollowings.Query { UserId = userId, Predicate = predicate }));
     }
 
-    //
+    /// <summary>
+    /// Retrieves a list of activities for a specific user, with an optional filter.
+    /// </summary>
+    /// <param name="userId">The ID of the user whose activities are to be retrieved.</param>
+    /// <param name="filter">A filter string to specify which activities to retrieve (e.g., "hosting", "past", "future").</param>
+    /// <returns>A <see cref="HandleResult"/> containing a list of <see cref="Activity"/> objects or an error response.</returns>
     [HttpGet("{userId}/activities")]
     public async Task<ActionResult> GetUserActivities(string userId, string filter)
     {

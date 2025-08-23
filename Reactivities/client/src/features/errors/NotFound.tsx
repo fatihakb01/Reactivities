@@ -2,6 +2,23 @@ import { SearchOff } from "@mui/icons-material";
 import { Button, Paper, Typography } from "@mui/material";
 import { Link } from "react-router";
 
+/**
+ * A component to display for a 404 (Not Found) error page.
+ *
+ * This component provides a friendly user experience for when a requested page
+ * does not exist within the application.
+ *
+ * Features:
+ * - Displays a clear "Not Found" message with a search icon.
+ * - Provides a call-to-action button to navigate back to the main activities page.
+ * - Uses Material UI for styling and layout.
+ *
+ * Example usage:
+ * ```tsx
+ * // Renders on a URL that does not match any route, e.g., /not-found
+ * <NotFound />
+ * ```
+ */
 export default function NotFound() {
   return (
     <Paper
