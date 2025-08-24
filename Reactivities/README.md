@@ -90,4 +90,4 @@ Contributions are welcome!
 ## License
 
 This project is licensed under the MIT License. 
-See [LICENSE.md](./docs/LICENSE.md).
+See [LICENSE.md](./LICENSE.md).
