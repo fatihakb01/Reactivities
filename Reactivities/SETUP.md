@@ -7,7 +7,7 @@ This guide explains how to run **Reactivities** locally with all required depend
 Before running the project, make sure you have the following installed:
 
 - [Node.js](https://nodejs.org/) >= 22 (comes with `npm`)
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for SQL Server)
 - [SQL Server Management Studio (SSMS)](https://learn.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms) *(optional, to inspect DB)*
 
